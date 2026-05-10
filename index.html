@@ -1,1322 +1,1063 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tolara</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --yellow:#FFFC00;--bg:#0a0a0a;--surface:#161616;--surface2:#222;
-      --surface3:#2a2a2a;--text:#fff;--muted:#888;--border:#2a2a2a;
-      --green:#4CD964;--red:#FF3A30;--blue:#3478F6;
-    }
-    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    /* ── AUTH SCREEN ── */
-    #authScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;width:100%;padding:20px}
-    .auth-wrap{width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;gap:0}
-    .auth-logo-area{text-align:center;margin-bottom:28px}
-    .ghost-logo{font-size:58px;display:inline-block;animation:ghost-bob 2.5s ease-in-out infinite}
-    @keyframes ghost-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-    .auth-title{font-size:32px;font-weight:900;color:var(--yellow);margin-top:6px}
-    .auth-subtitle{font-size:13px;color:var(--muted);margin-top:4px}
+  <!-- SEO -->
+  <title>LuaForge AI — Build Roblox Games With AI | Lua Scripting Assistant</title>
+  <meta name="description" content="LuaForge AI is the #1 AI-powered Roblox Lua scripting assistant. Generate complete scripts, fix errors instantly, and learn Lua with AI. Start free today." />
+  <meta name="keywords" content="Roblox Lua AI, Roblox scripting assistant, Lua code generator, Roblox script AI, Lua AI tool, Roblox developer tools, AI game scripting, Roblox Studio helper" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://luaforgeai.com" />
 
-    /* Tab switcher */
-    .auth-tabs{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:14px 14px 0 0;width:100%;overflow:hidden}
-    .auth-tab{flex:1;padding:13px;text-align:center;font-size:14px;font-weight:800;color:var(--muted);cursor:pointer;transition:all .2s;border-bottom:3px solid transparent}
-    .auth-tab.active{color:var(--yellow);border-bottom-color:var(--yellow);background:var(--surface2)}
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://luaforgeai.com" />
+  <meta property="og:title" content="LuaForge AI — Build Roblox Games With AI" />
+  <meta property="og:description" content="Generate complete Lua scripts, fix errors, and learn Roblox scripting with your AI coding partner. Ship faster. Build smarter." />
+  <meta property="og:image" content="https://luaforgeai.com/assets/og-image.png" />
+  <meta property="og:site_name" content="LuaForge AI" />
 
-    /* Auth card */
-    .auth-card{background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 20px 20px;padding:28px 28px 24px;width:100%}
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LuaForge AI — Build Roblox Games With AI" />
+  <meta name="twitter:description" content="Generate complete Lua scripts, fix errors, and learn Roblox scripting with your AI coding partner." />
+  <meta name="twitter:image" content="https://luaforgeai.com/assets/og-image.png" />
 
-    /* Two-column login */
-    .login-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-bottom:16px}
-    .col-field{display:flex;flex-direction:column;gap:6px}
-    .col-label{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
-    .auth-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color .2s}
-    .auth-input:focus{border-color:var(--yellow)}
-    .auth-input::placeholder{color:var(--muted);font-weight:400}
-    .auth-input.valid{border-color:var(--green)}
-    .auth-input.invalid{border-color:var(--red)}
-    .auth-divider{grid-column:1/-1;height:1px;background:var(--border);margin:2px 0}
+  <meta name="theme-color" content="#080A0F" />
 
-    /* Signup steps */
-    .signup-step{display:none;flex-direction:column;gap:14px;width:100%}
-    .signup-step.active{display:flex}
-    .step-header{margin-bottom:4px}
-    .step-title{font-size:20px;font-weight:900}
-    .step-sub{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
-    .step-progress{display:flex;gap:5px;margin-bottom:16px}
-    .step-dot{height:4px;border-radius:2px;background:var(--border);flex:1;transition:background .3s}
-    .step-dot.done{background:var(--yellow)}
-    .input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .field-wrap{display:flex;flex-direction:column;gap:5px}
-    .field-label{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-    .field-hint{font-size:11px;color:var(--muted);min-height:14px}
-    .field-hint.ok{color:var(--green)}
-    .field-hint.err{color:var(--red)}
-    .field-hint.checking{color:var(--muted)}
+  <!-- Favicon inline SVG -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 36'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%234F8EF7'/><stop offset='100%25' stop-color='%23A855F7'/></linearGradient></defs><path d='M16 1L30 9V27L16 35L2 27V9Z' fill='url(%23g)'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='13' font-weight='700' fill='white'>L</text></svg>" />
 
-    /* Password strength */
-    .pw-strength{display:flex;gap:3px;margin-top:5px}
-    .pw-bar{height:3px;flex:1;border-radius:2px;background:var(--border);transition:background .3s}
-    .pw-bar.weak{background:var(--red)}
-    .pw-bar.medium{background:#FF9F0A}
-    .pw-bar.strong{background:var(--green)}
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    /* Buttons */
-    .btn-yellow{width:100%;background:var(--yellow);color:#000;border:none;border-radius:12px;padding:13px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .15s}
-    .btn-yellow:hover{opacity:.9;transform:translateY(-1px)}
-    .btn-yellow:active{transform:scale(.98)}
-    .btn-yellow:disabled{opacity:.35;cursor:not-allowed;transform:none}
-    .btn-ghost{width:100%;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:12px;padding:11px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
-    .btn-ghost:hover{border-color:var(--yellow);color:var(--yellow)}
-    .auth-err{font-size:12px;color:var(--red);font-weight:700;min-height:16px;text-align:center}
+  <!-- Fonts: Clash Display + Space Mono + Plus Jakarta Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
-    /* ── OTP VERIFY SCREEN ── */
-    #verifyScreen{display:none;flex-direction:column;align-items:center;justify-content:center;height:100vh;width:100%;padding:20px}
-    .verify-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
-    .verify-icon{font-size:52px;animation:ghost-bob 2.5s ease-in-out infinite}
-    .verify-title{font-size:22px;font-weight:900}
-    .verify-sub{font-size:13px;color:var(--muted);line-height:1.6}
-    .otp-row{display:flex;gap:8px;justify-content:center;margin:6px 0}
-    .otp-box{width:44px;height:54px;background:var(--surface2);border:2px solid var(--border);border-radius:12px;text-align:center;font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:var(--text);outline:none;transition:border-color .2s;caret-color:var(--yellow)}
-    .otp-box:focus{border-color:var(--yellow)}
-    .otp-box.filled{border-color:var(--yellow)}
-    .otp-box.invalid{border-color:var(--red);animation:shake .4s ease}
-    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-    .resend-row{font-size:12px;color:var(--muted);display:flex;gap:4px;align-items:center}
-    .resend-link{color:var(--yellow);cursor:pointer;font-weight:700;text-decoration:none}
-    .resend-link:hover{text-decoration:underline}
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    /* Demo email box */
-    .demo-email-box{background:var(--surface2);border:1px dashed #444;border-radius:10px;padding:12px 14px;width:100%;text-align:left}
-    .demo-email-label{font-size:10px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-    .demo-badge{background:#333;color:var(--yellow);border-radius:4px;padding:2px 6px;font-size:9px;font-weight:900;letter-spacing:.3px}
-    .demo-email-code{font-size:26px;font-weight:900;color:var(--yellow);letter-spacing:8px;text-align:center;margin:6px 0}
-    .demo-email-note{font-size:11px;color:var(--muted);line-height:1.5}
+  <!-- Prism syntax highlighting — VS Code Dark+ theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
 
-    /* ── USERNAME SETUP ── */
-    #usernameScreen{display:none;flex-direction:column;align-items:center;justify-content:center;height:100vh;width:100%;padding:20px}
-    .username-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:38px 32px;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
-    .un-pfp-fallback{width:72px;height:72px;border-radius:50%;border:3px solid var(--yellow);display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--surface2)}
-    .un-title{font-size:22px;font-weight:900}
-    .un-sub{font-size:13px;color:var(--muted);line-height:1.6}
-    .setup-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;outline:none;transition:border-color .2s;text-align:center}
-    .setup-input:focus{border-color:var(--yellow)}
-    .setup-input::placeholder{color:var(--muted);font-weight:400}
-    .setup-input.valid{border-color:var(--green)}
-    .setup-input.invalid{border-color:var(--red)}
-    .un-status{font-size:12px;font-weight:700;min-height:16px}
-    .un-status.ok{color:var(--green)}
-    .un-status.err{color:var(--red)}
-    .un-status.checking{color:var(--muted)}
-
-    /* ── MAIN APP ── */
-    #mainApp{display:none;width:100%;height:100vh;max-width:1100px;max-height:720px}
-    .layout{display:flex;height:100%;border:1px solid var(--border);border-radius:18px;overflow:hidden}
-    .sidebar{width:290px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column}
-    .sidebar-top{padding:14px 14px 10px;border-bottom:1px solid var(--border);position:relative}
-    .logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-    .logo-left{display:flex;align-items:center;gap:8px}
-    .logo-ghost{width:30px;height:30px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px}
-    .logo-text{font-size:17px;font-weight:900;color:var(--yellow)}
-    .icon-btn{background:none;border:none;cursor:pointer;font-size:17px;padding:5px;border-radius:8px;transition:background .15s;color:var(--text)}
-    .icon-btn:hover{background:var(--surface2)}
-    .search-wrap{position:relative}
-    .search-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:8px 12px 8px 32px;color:var(--text);font-family:'Nunito',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
-    .search-input:focus{border-color:var(--yellow)}
-    .search-input::placeholder{color:var(--muted)}
-    .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
-    .tabs{display:flex;border-bottom:1px solid var(--border)}
-    .tab{flex:1;padding:9px 4px;text-align:center;font-size:12px;font-weight:800;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .2s}
-    .tab.active{color:var(--yellow);border-bottom-color:var(--yellow)}
-    .list-wrap{flex:1;overflow-y:auto;padding:6px}
-    .list-wrap::-webkit-scrollbar{width:3px}
-    .list-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-    .convo-item{display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;border-radius:10px;margin-bottom:2px;transition:background .15s}
-    .convo-item:hover,.convo-item.active{background:var(--surface2)}
-    .av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;position:relative}
-    .av.ring{box-shadow:0 0 0 2.5px var(--yellow)}
-    .online-dot{width:10px;height:10px;background:var(--green);border-radius:50%;position:absolute;bottom:0;right:0;border:2px solid var(--surface)}
-    .ci{flex:1;min-width:0}
-    .cn{font-size:13px;font-weight:800;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .cp{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .cp.bold{color:var(--text);font-weight:700}
-    .cr{text-align:right;flex-shrink:0}
-    .ct{font-size:10px;color:var(--muted)}
-    .badge{background:var(--yellow);color:#000;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;margin-top:3px;margin-left:auto}
-    .empty-list{padding:24px 16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
-    .section-hdr{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 10px 4px}
-    .search-result-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;margin-bottom:2px;border:1px solid var(--border)}
-    .chat{flex:1;display:flex;flex-direction:column;background:var(--bg)}
-    .chat-hdr{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface);flex-shrink:0}
-    .hav{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
-    .hi{flex:1}
-    .hn{font-size:14px;font-weight:800}
-    .hs{font-size:11px;color:var(--muted)}
-    .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
-    .msgs::-webkit-scrollbar{width:3px}
-    .msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-    .date-sep{text-align:center;font-size:11px;color:var(--muted);padding:6px 0;font-weight:700}
-    .msg-row{display:flex;align-items:flex-end;gap:7px}
-    .msg-row.mine{flex-direction:row-reverse}
-    .msav{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;flex-shrink:0}
-    .bubble{max-width:280px;padding:9px 13px;border-radius:17px;font-size:14px;line-height:1.4;word-break:break-word}
-    .bubble.theirs{background:var(--surface2);border-bottom-left-radius:4px}
-    .bubble.mine{background:var(--yellow);color:#000;font-weight:700;border-bottom-right-radius:4px}
-    .mtime{font-size:10px;color:var(--muted);padding:0 3px;flex-shrink:0;align-self:flex-end}
-    .img-bub{max-width:220px;border-radius:14px;overflow:hidden;cursor:pointer}
-    .img-bub img{width:100%;display:block;border-radius:14px}
-    .typing-row{display:flex;align-items:flex-end;gap:7px;margin-top:4px}
-    .typing-bub{background:var(--surface2);border-radius:17px;border-bottom-left-radius:4px;padding:10px 14px;display:flex;gap:4px}
-    .td{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:tdot 1s infinite}
-    .td:nth-child(2){animation-delay:.15s}
-    .td:nth-child(3){animation-delay:.3s}
-    @keyframes tdot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
-    .input-bar{padding:10px 14px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;flex-shrink:0}
-    .chat-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:9px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
-    .chat-input:focus{border-color:var(--yellow)}
-    .chat-input::placeholder{color:var(--muted)}
-    .send-btn{background:var(--yellow);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;transition:transform .1s}
-    .send-btn:hover{transform:scale(1.06)}
-    .send-btn:active{transform:scale(.94)}
-    .attach-btn{background:none;border:none;color:var(--yellow);cursor:pointer;font-size:20px;padding:4px;flex-shrink:0;line-height:1}
-    .empty-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted)}
-    .empty-ghost{font-size:60px;opacity:.2;animation:ghost-bob 3s ease-in-out infinite}
-    .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--yellow);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;color:var(--text);opacity:0;transition:all .3s;pointer-events:none;z-index:9000;white-space:nowrap}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .img-viewer{position:fixed;inset:0;background:rgba(0,0,0,.93);display:flex;align-items:center;justify-content:center;z-index:8000;cursor:pointer}
-    .img-viewer img{max-width:90vw;max-height:90vh;border-radius:12px}
-    .user-menu-btn{width:30px;height:30px;border-radius:50%;overflow:hidden;cursor:pointer;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;transition:border-color .2s}
-    .user-menu-btn:hover{border-color:var(--yellow)}
-    .dropdown{position:absolute;top:48px;right:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:6px;z-index:500;min-width:160px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
-    .dropdown-item{padding:9px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s}
-    .dropdown-item:hover{background:var(--surface2)}
-    .dropdown-item.danger{color:var(--red)}
-    #fileInput{display:none}
-    ::-webkit-scrollbar{width:4px}
-    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-
-    @media (max-width: 760px){
-      body{align-items:stretch;justify-content:stretch}
-      #mainApp{max-width:none;max-height:none;height:100vh}
-      .layout{border:none;border-radius:0}
-      .sidebar{width:38%;min-width:140px}
-      .auth-card{padding:22px 18px}
-      .login-columns,.input-row{grid-template-columns:1fr}
-      .otp-box{width:38px;height:50px}
-      .bubble{max-width:220px}
-    }
-
-  </style>
+  <!-- Main stylesheet -->
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
 
-<!-- ══ AUTH SCREEN ══ -->
-<div id="authScreen">
-  <div class="auth-wrap">
-    <div class="auth-logo-area">
-      <div class="ghost-logo">👻</div>
-      <div class="auth-title">Tolara</div>
-      <div class="auth-subtitle">Real-time messaging with friends</div>
+  <!-- Particle canvas -->
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <!-- Ambient glow orbs -->
+  <div class="ambient-orb orb-1" aria-hidden="true"></div>
+  <div class="ambient-orb orb-2" aria-hidden="true"></div>
+  <div class="ambient-orb orb-3" aria-hidden="true"></div>
+
+  <!-- ══════════════════════════════════════════
+       NAVBAR
+  ══════════════════════════════════════════ -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" aria-label="LuaForge AI home">
+        <svg class="logo-hex" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M16 1L30 9V27L16 35L2 27V9L16 1Z" stroke="url(#hexGrad)" stroke-width="1.5" fill="url(#hexFill)"/>
+          <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="white">L</text>
+          <defs>
+            <linearGradient id="hexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4F8EF7"/>
+              <stop offset="100%" stop-color="#A855F7"/>
+            </linearGradient>
+            <linearGradient id="hexFill" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4F8EF7" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#A855F7" stop-opacity="0.18"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="logo-text">LuaForge <span class="logo-ai">AI</span></span>
+      </a>
+
+      <ul class="nav-links" role="list">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#tools">Tools</a></li>
+        <li><a href="#demo">Demo</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#community">Community</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="#" class="btn-ghost">Log in</a>
+        <a href="#pricing" class="btn-primary nav-cta">
+          <i class="fa-solid fa-bolt" aria-hidden="true"></i> Get Started
+        </a>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
 
-    <div class="auth-tabs">
-      <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Log In</div>
-      <div class="auth-tab" id="tabSignup" onclick="switchAuthTab('signup')">Sign Up</div>
+    <div class="mobile-menu" id="mobileMenu" role="menu">
+      <a href="#features" role="menuitem">Features</a>
+      <a href="#tools" role="menuitem">Tools</a>
+      <a href="#demo" role="menuitem">Demo</a>
+      <a href="#pricing" role="menuitem">Pricing</a>
+      <a href="#community" role="menuitem">Community</a>
+      <div class="mobile-actions">
+        <a href="#" class="btn-ghost w-full">Log in</a>
+        <a href="#pricing" class="btn-primary w-full">
+          <i class="fa-solid fa-bolt" aria-hidden="true"></i> Get Started
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════ -->
+  <section class="hero" id="hero" aria-label="Hero section">
+    <div class="hero-bg-grid" aria-hidden="true"></div>
+    <div class="hero-glow glow-1" aria-hidden="true"></div>
+    <div class="hero-glow glow-2" aria-hidden="true"></div>
+
+    <!-- Floating code snippets -->
+    <div class="floating-snippet snippet-1" aria-hidden="true">
+      <span class="lua-kw">local</span> Players <span class="lua-op">=</span><br/>
+      &nbsp;&nbsp;game:<span class="lua-fn">GetService</span>(<span class="lua-str">"Players"</span>)
+    </div>
+    <div class="floating-snippet snippet-2" aria-hidden="true">
+      <span class="lua-cm">-- ✓ AI Generated</span><br/>
+      hrp:<span class="lua-fn">TakeDamage</span>(DAMAGE)
+    </div>
+    <div class="floating-snippet snippet-3" aria-hidden="true">
+      <span class="lua-kw">local</span> DAMAGE <span class="lua-op">=</span> <span class="lua-num">25</span><br/>
+      <span class="lua-kw">local</span> COOLDOWN <span class="lua-op">=</span> <span class="lua-num">1.0</span>
     </div>
 
-    <div class="auth-card">
+    <div class="hero-content">
+      <div class="hero-badge fade-up">
+        <span class="badge-dot" aria-hidden="true"></span>
+        <span>AI-Powered Roblox Scripting</span>
+        <span class="badge-sep" aria-hidden="true">·</span>
+        <span class="badge-new">Powered by Gemini</span>
+      </div>
 
-      <!-- LOGIN MODE -->
-      <div id="loginMode">
-        <div class="login-columns">
-          <div class="col-field">
-            <div class="col-label">Email or Username</div>
-            <input class="auth-input" id="loginIdent" type="text" placeholder="you@email.com"
-              autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
-          </div>
-          <div class="col-field">
-            <div class="col-label">Password</div>
-            <input class="auth-input" id="loginPass" type="password" placeholder="••••••••"
-              autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-          </div>
+      <h1 class="hero-title fade-up delay-1">
+        Build Roblox<br/>
+        <span class="gradient-text glow-text">Games With AI</span>
+      </h1>
+
+      <p class="hero-subtitle fade-up delay-2">
+        Generate complete Lua scripts, debug errors instantly, and learn Roblox scripting
+        with your AI coding partner. Ship faster. Build smarter.
+      </p>
+
+      <div class="hero-input-wrap fade-up delay-3">
+        <div class="hero-input-box" role="search">
+          <span class="input-icon" aria-hidden="true"><i class="fa-solid fa-terminal"></i></span>
+          <label for="heroInput" class="sr-only">Describe the script you want</label>
+          <input
+            type="text"
+            id="heroInput"
+            placeholder='Try: "Make a sword combat system"'
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Describe the Roblox Lua script you want to generate"
+          />
+          <button class="btn-generate" id="generateBtn" aria-label="Generate script">
+            <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+            <span>Generate</span>
+          </button>
         </div>
-        <div class="auth-err" id="loginErr"></div>
-        <button class="btn-yellow" id="loginBtn" onclick="doLogin()" style="margin-top:4px">Log In →</button>
-        <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:12px">
-          No account? <span style="color:var(--yellow);cursor:pointer;font-weight:700" onclick="switchAuthTab('signup')">Sign up free</span>
+        <div class="hero-suggestions" role="list" aria-label="Example prompts">
+          <button class="suggestion-chip" data-text="Make a gun shooting system with raycasting" role="listitem">🔫 Gun system</button>
+          <button class="suggestion-chip" data-text="Create a tycoon money dropper that gives cash every 5 seconds" role="listitem">💰 Money dropper</button>
+          <button class="suggestion-chip" data-text="Add an animated leaderboard GUI with player rankings" role="listitem">🏆 Leaderboard GUI</button>
+          <button class="suggestion-chip" data-text="Make a vehicle spawner with a GUI selection menu" role="listitem">🚗 Vehicle spawner</button>
+          <button class="suggestion-chip" data-text="Create a smooth day and night cycle script" role="listitem">🌙 Day/Night cycle</button>
+        </div>
+      </div>
+
+      <div class="hero-btns fade-up delay-4">
+        <a href="#demo" class="btn-primary btn-large">
+          <i class="fa-solid fa-bolt" aria-hidden="true"></i> Try AI Now
+        </a>
+        <a href="#demo" class="btn-outline btn-large">
+          <i class="fa-solid fa-play" aria-hidden="true"></i> Watch Demo
+        </a>
+      </div>
+    </div>
+
+    <!-- Hero code output panel -->
+    <div class="hero-output-panel" id="heroOutput" aria-live="polite" aria-label="Generated code output">
+      <div class="output-header">
+        <div class="output-dots" aria-hidden="true">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <span class="output-filename">
+          <i class="fa-solid fa-file-code" aria-hidden="true"></i> luaforge_output.lua
+        </span>
+        <button class="copy-btn" id="heroCopyBtn" aria-label="Copy generated code">
+          <i class="fa-regular fa-copy" aria-hidden="true"></i> <span>Copy</span>
+        </button>
+      </div>
+      <div class="output-body" id="heroOutputBody">
+        <div class="ai-typing-indicator" id="typingIndicator" style="display:none;">
+          <div class="typing-label">
+            <i class="fa-solid fa-microchip" aria-hidden="true"></i> LuaForge AI is generating
+          </div>
+          <div class="typing-dots" aria-label="Loading"><span></span><span></span><span></span></div>
+        </div>
+        <pre id="heroCode" class="code-block language-lua" style="display:none;"></pre>
+        <div class="output-placeholder" id="outputPlaceholder">
+          <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+          <span>Your generated script will appear here</span>
+          <span class="output-hint">Describe what you want above and click Generate</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       TRUST BANNER
+  ══════════════════════════════════════════ -->
+  <div class="trust-banner" aria-label="Social proof">
+    <div class="trust-inner">
+      <span class="trust-label">Trusted by Roblox developers worldwide</span>
+      <div class="trust-logos">
+        <span><i class="fa-brands fa-discord" aria-hidden="true"></i> 2K+ Discord Members</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span><i class="fa-solid fa-code" aria-hidden="true"></i> 10K+ Scripts Generated</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span><i class="fa-solid fa-star" aria-hidden="true"></i> 4.9/5 Rating</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span><i class="fa-solid fa-rocket" aria-hidden="true"></i> 99% Faster Workflow</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       STATS
+  ══════════════════════════════════════════ -->
+  <section class="stats-section" id="stats" aria-label="Platform statistics">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card fade-up">
+          <div class="stat-icon" aria-hidden="true"><i class="fa-solid fa-code"></i></div>
+          <div class="stat-number-wrap">
+            <span class="stat-number" data-target="10000">0</span>
+            <span class="stat-suffix">+</span>
+          </div>
+          <span class="stat-desc">Scripts Generated</span>
+        </div>
+        <div class="stat-card fade-up delay-1">
+          <div class="stat-icon" aria-hidden="true"><i class="fa-solid fa-users"></i></div>
+          <div class="stat-number-wrap">
+            <span class="stat-number" data-target="2000">0</span>
+            <span class="stat-suffix">+</span>
+          </div>
+          <span class="stat-desc">Active Developers</span>
+        </div>
+        <div class="stat-card fade-up delay-2">
+          <div class="stat-icon" aria-hidden="true"><i class="fa-solid fa-bolt"></i></div>
+          <div class="stat-number-wrap">
+            <span class="stat-number" data-target="99">0</span>
+            <span class="stat-suffix">%</span>
+          </div>
+          <span class="stat-desc">Faster Workflow</span>
+        </div>
+        <div class="stat-card fade-up delay-3">
+          <div class="stat-icon" aria-hidden="true"><i class="fa-solid fa-star"></i></div>
+          <div class="stat-number-wrap">
+            <span class="stat-number" data-target="49">0</span>
+            <span class="stat-suffix">/5</span>
+          </div>
+          <span class="stat-desc">Average Rating</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       FEATURES
+  ══════════════════════════════════════════ -->
+  <section class="features-section" id="features" aria-label="Features">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label fade-up">What We Offer</div>
+        <h2 class="section-title fade-up delay-1">
+          Everything you need to<br/><span class="gradient-text">script smarter</span>
+        </h2>
+        <p class="section-sub fade-up delay-2">
+          Three powerful AI tools built for every Roblox developer — from beginners to full studios.
         </p>
       </div>
 
-      <!-- SIGNUP MODE -->
-      <div id="signupMode" style="display:none">
-        <div class="step-progress" id="stepProgress">
-          <div class="step-dot done" id="dot0"></div>
-          <div class="step-dot" id="dot1"></div>
-          <div class="step-dot" id="dot2"></div>
-          <div class="step-dot" id="dot3"></div>
-        </div>
+      <div class="features-grid">
+        <article class="feature-card fade-up">
+          <div class="feature-card-glow glow-blue" aria-hidden="true"></div>
+          <div class="feature-icon-wrap icon-blue" aria-hidden="true">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <h3>Script Generator</h3>
+          <p>Describe what you need in plain English. LuaForge AI writes complete, functional Roblox Lua scripts — from simple tools to complex game systems — in seconds.</p>
+          <div class="feature-tags" aria-label="Tags">
+            <span>Instant Output</span>
+            <span>Lua 5.1</span>
+            <span>Roblox API</span>
+          </div>
+        </article>
 
-        <!-- Step 1: Name -->
-        <div class="signup-step active" id="step1">
-          <div class="step-header">
-            <div class="step-title">What's your name?</div>
-            <div class="step-sub">This is how you'll appear to friends.</div>
+        <article class="feature-card fade-up delay-1">
+          <div class="feature-card-glow glow-purple" aria-hidden="true"></div>
+          <div class="feature-icon-wrap icon-purple" aria-hidden="true">
+            <i class="fa-solid fa-bug-slash"></i>
           </div>
-          <div class="input-row">
-            <div class="field-wrap">
-              <div class="field-label">First Name</div>
-              <input class="auth-input" id="signupFirst" type="text" placeholder="First"
-                onkeydown="if(event.key==='Enter')document.getElementById('signupLast').focus()">
-            </div>
-            <div class="field-wrap">
-              <div class="field-label">Last Name</div>
-              <input class="auth-input" id="signupLast" type="text" placeholder="Last"
-                onkeydown="if(event.key==='Enter')signupNext(1)">
-            </div>
+          <h3>AI Error Fixer</h3>
+          <p>Paste any broken script. Our AI pinpoints exactly what's wrong, explains the issue in plain terms, and returns a working version — ready to drop into Studio.</p>
+          <div class="feature-tags">
+            <span>Auto Debug</span>
+            <span>Stack Trace</span>
+            <span>Explanations</span>
           </div>
-          <div class="auth-err" id="step1Err"></div>
-          <button class="btn-yellow" onclick="signupNext(1)">Continue →</button>
-        </div>
+        </article>
 
-        <!-- Step 2: Email -->
-        <div class="signup-step" id="step2">
-          <div class="step-header">
-            <div class="step-title">What's your email?</div>
-            <div class="step-sub">We'll send a verification code to confirm it's you.</div>
+        <article class="feature-card fade-up delay-2">
+          <div class="feature-card-glow glow-cyan" aria-hidden="true"></div>
+          <div class="feature-icon-wrap icon-cyan" aria-hidden="true">
+            <i class="fa-solid fa-graduation-cap"></i>
           </div>
-          <div class="field-wrap">
-            <div class="field-label">Email Address</div>
-            <input class="auth-input" id="signupEmail" type="email" placeholder="you@email.com"
-              autocomplete="email" onkeydown="if(event.key==='Enter')signupNext(2)">
-            <div class="field-hint" id="emailHint"></div>
+          <h3>Lua Tutor</h3>
+          <p>Learn Roblox scripting with an AI tutor that adapts to your level. It explains concepts, walks through examples, and answers any question at any skill level.</p>
+          <div class="feature-tags">
+            <span>Interactive</span>
+            <span>Beginner-Friendly</span>
+            <span>Step-by-Step</span>
           </div>
-          <div class="auth-err" id="step2Err"></div>
-          <button class="btn-yellow" onclick="signupNext(2)">Continue →</button>
-          <button class="btn-ghost" onclick="signupBack(2)">← Back</button>
-        </div>
-
-        <!-- Step 3: Password -->
-        <div class="signup-step" id="step3">
-          <div class="step-header">
-            <div class="step-title">Create a password</div>
-            <div class="step-sub">At least 8 characters. Make it strong!</div>
-          </div>
-          <div class="field-wrap">
-            <div class="field-label">Password</div>
-            <input class="auth-input" id="signupPass" type="password" placeholder="Min. 8 characters"
-              autocomplete="new-password" oninput="checkPwStrength(this.value)"
-              onkeydown="if(event.key==='Enter')document.getElementById('signupPass2').focus()">
-            <div class="pw-strength" id="pwStrength">
-              <div class="pw-bar" id="pb1"></div>
-              <div class="pw-bar" id="pb2"></div>
-              <div class="pw-bar" id="pb3"></div>
-            </div>
-          </div>
-          <div class="field-wrap">
-            <div class="field-label">Confirm Password</div>
-            <input class="auth-input" id="signupPass2" type="password" placeholder="Repeat password"
-              autocomplete="new-password" onkeydown="if(event.key==='Enter')signupNext(3)">
-          </div>
-          <div class="auth-err" id="step3Err"></div>
-          <button class="btn-yellow" onclick="signupNext(3)">Continue →</button>
-          <button class="btn-ghost" onclick="signupBack(3)">← Back</button>
-        </div>
-
-        <!-- Step 4: Username -->
-        <div class="signup-step" id="step4">
-          <div class="step-header">
-            <div class="step-title">Choose your username</div>
-            <div class="step-sub">Pick a unique handle so friends can find you. You can't change this later.</div>
-          </div>
-          <div class="field-wrap">
-            <div class="field-label">Username</div>
-            <input class="auth-input" id="signupUsername" type="text" placeholder="@username"
-              maxlength="20" oninput="onUsernameType(this.value)"
-              onkeydown="if(event.key==='Enter')signupNext(4)" style="text-align:center">
-            <div class="field-hint" id="usernameHint"></div>
-          </div>
-          <div class="auth-err" id="step4Err"></div>
-          <button class="btn-yellow" id="usernameNextBtn" onclick="signupNext(4)" disabled>Send Verification Code →</button>
-          <button class="btn-ghost" onclick="signupBack(4)">← Back</button>
-        </div>
-
-      </div><!-- /signupMode -->
-    </div><!-- /auth-card -->
-  </div>
-</div>
-
-<!-- ══ VERIFY SCREEN ══ -->
-<div id="verifyScreen">
-  <div class="verify-card">
-    <div class="verify-icon">📬</div>
-    <div class="verify-title">Check your email</div>
-    <div class="verify-sub">We sent a 6-digit code to<br><strong id="verifyEmailLabel" style="color:var(--yellow)"></strong></div>
-
-    <div class="otp-row" id="otpRow">
-      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
-        onInput="otpInput(this,0)" onKeydown="otpKeydown(event,0)">
-      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
-        onInput="otpInput(this,1)" onKeydown="otpKeydown(event,1)">
-      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
-        onInput="otpInput(this,2)" onKeydown="otpKeydown(event,2)">
-      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
-        onInput="otpInput(this,3)" onKeydown="otpKeydown(event,3)">
-      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
-        onInput="otpInput(this,4)" onKeydown="otpKeydown(event,4)">
-      <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"
-        onInput="otpInput(this,5)" onKeydown="otpKeydown(event,5)">
+        </article>
+      </div>
     </div>
+  </section>
 
-    <div class="auth-err" id="otpErr"></div>
+  <!-- ══════════════════════════════════════════
+       TOOLS
+  ══════════════════════════════════════════ -->
+  <section class="tools-section" id="tools" aria-label="Developer Tools">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label fade-up">Developer Tools</div>
+        <h2 class="section-title fade-up delay-1">
+          Powerful tools for<br/><span class="gradient-text">every problem</span>
+        </h2>
+        <p class="section-sub fade-up delay-2">Fix scripts and decode Roblox errors in seconds.</p>
+      </div>
 
-    <!-- Verify button -->
-    <button class="btn-yellow" id="verifyBtn" onclick="submitOtp()" disabled style="width:100%;margin-top:2px">
-      Verify Code →
+      <div class="tools-tabs fade-up delay-3" role="tablist" aria-label="Tool tabs">
+        <button class="tab-btn active" data-tab="fix" role="tab" aria-selected="true" aria-controls="tab-fix">
+          <i class="fa-solid fa-wrench" aria-hidden="true"></i> Fix My Script
+        </button>
+        <button class="tab-btn" data-tab="explain" role="tab" aria-selected="false" aria-controls="tab-explain">
+          <i class="fa-solid fa-magnifying-glass-minus" aria-hidden="true"></i> Explain This Error
+        </button>
+      </div>
+
+      <!-- Fix My Script -->
+      <div class="tool-panel active" id="tab-fix" role="tabpanel" aria-label="Fix My Script tool">
+        <div class="tool-two-col">
+          <div class="tool-col">
+            <div class="tool-col-header">
+              <span><i class="fa-solid fa-file-code" aria-hidden="true"></i> Paste Broken Script</span>
+              <button class="clear-btn" id="clearFixInput" aria-label="Clear input">
+                <i class="fa-solid fa-xmark"></i> Clear
+              </button>
+            </div>
+            <div class="code-editor-wrap">
+              <label for="fixScriptInput" class="sr-only">Paste your broken Roblox Lua script</label>
+              <textarea
+                id="fixScriptInput"
+                class="code-textarea"
+                spellcheck="false"
+                autocomplete="off"
+                placeholder="-- Paste your broken Roblox Lua script here...
+-- Example:
+local Players = game:GetService('Players')
+local player = Players.LocalPLayer  -- typo here"
+              ></textarea>
+            </div>
+            <button class="btn-primary full-width mt-3" id="fixScriptBtn">
+              <i class="fa-solid fa-wrench" aria-hidden="true"></i> Fix My Script
+            </button>
+          </div>
+
+          <div class="tool-col">
+            <div class="tool-col-header">
+              <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Fixed Script</span>
+              <button class="copy-btn" id="fixOutputCopyBtn" style="display:none;" aria-label="Copy fixed script">
+                <i class="fa-regular fa-copy" aria-hidden="true"></i> <span>Copy</span>
+              </button>
+            </div>
+            <div class="code-output-wrap" id="fixOutput" aria-live="polite">
+              <div class="tool-placeholder">
+                <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+                <span>Your fixed script will appear here</span>
+              </div>
+            </div>
+            <div class="error-explanation" id="fixExplanation" style="display:none;">
+              <div class="explanation-header">
+                <i class="fa-solid fa-lightbulb" aria-hidden="true"></i> What was fixed
+              </div>
+              <div id="fixExplanationText"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explain This Error -->
+      <div class="tool-panel" id="tab-explain" role="tabpanel" aria-label="Explain This Error tool">
+        <div class="tool-two-col">
+          <div class="tool-col">
+            <div class="tool-col-header">
+              <span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Paste Error Message</span>
+              <button class="clear-btn" id="clearExplainInput" aria-label="Clear input">
+                <i class="fa-solid fa-xmark"></i> Clear
+              </button>
+            </div>
+            <div class="error-examples" role="list" aria-label="Example errors">
+              <button class="err-chip" data-error="attempt to index nil value 'player'">attempt to index nil</button>
+              <button class="err-chip" data-error="Stack overflow in script">Stack overflow</button>
+              <button class="err-chip" data-error="attempt to call a nil value">nil value call</button>
+              <button class="err-chip" data-error="bad argument #1 to 'format' (string expected)">bad argument</button>
+            </div>
+            <label for="explainErrorInput" class="sr-only">Paste your Roblox Studio error message</label>
+            <textarea
+              id="explainErrorInput"
+              class="code-textarea"
+              style="min-height:180px;"
+              spellcheck="false"
+              placeholder="Paste your Roblox Studio error here...
+Example: attempt to index nil value 'player' - ServerScript:12"
+            ></textarea>
+            <button class="btn-primary full-width mt-3" id="explainErrorBtn">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Explain This Error
+            </button>
+          </div>
+
+          <div class="tool-col">
+            <div class="tool-col-header">
+              <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> AI Explanation</span>
+            </div>
+            <div class="explanation-output" id="explainOutput" aria-live="polite">
+              <div class="tool-placeholder">
+                <i class="fa-solid fa-magnifying-glass-minus" aria-hidden="true"></i>
+                <span>Error explanation will appear here</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       LIVE AI CHAT DEMO
+  ══════════════════════════════════════════ -->
+  <section class="demo-section" id="demo" aria-label="Live AI Chat Demo">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label fade-up">Live AI Chat</div>
+        <h2 class="section-title fade-up delay-1">
+          Chat with the AI <span class="gradient-text">in real-time</span>
+        </h2>
+        <p class="section-sub fade-up delay-2">
+          Ask anything about Roblox scripting. Get code, explanations, and fixes instantly.
+        </p>
+      </div>
+
+      <div class="chat-window fade-up delay-3" role="application" aria-label="LuaForge AI Chat">
+
+        <!-- Sidebar -->
+        <aside class="chat-sidebar" aria-label="Chat sidebar">
+          <div class="sidebar-header">
+            <span><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> History</span>
+            <button class="clear-chat-btn" id="clearChatBtn" title="Clear chat" aria-label="Clear chat history">
+              <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-label">Saved Prompts</div>
+            <div class="saved-prompts" id="savedPrompts">
+              <div class="saved-prompt" data-prompt="Make a sword combat system with damage and cooldown">
+                <i class="fa-solid fa-bookmark" aria-hidden="true"></i> Sword combat system
+              </div>
+              <div class="saved-prompt" data-prompt="Create a tycoon money dropper that gives players cash every 5 seconds">
+                <i class="fa-solid fa-bookmark" aria-hidden="true"></i> Tycoon money dropper
+              </div>
+              <div class="saved-prompt" data-prompt="Build a vehicle spawner with a GUI menu">
+                <i class="fa-solid fa-bookmark" aria-hidden="true"></i> Vehicle spawner GUI
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-label">Recent Chats</div>
+            <div class="chat-history" id="chatHistory">
+              <div class="history-empty">
+                <i class="fa-solid fa-comment-slash" aria-hidden="true"></i>
+                <span>No recent chats</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-footer">
+            <div class="usage-bar-wrap">
+              <div class="usage-label">
+                <span>Daily usage</span>
+                <span class="usage-count" id="usageCount">3 / 5 free</span>
+              </div>
+              <div class="usage-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" aria-label="Daily usage 3 of 5">
+                <div class="usage-fill" id="usageFill" style="width:60%"></div>
+              </div>
+            </div>
+            <a href="#pricing" class="upgrade-btn">
+              <i class="fa-solid fa-crown" aria-hidden="true"></i> Upgrade to Pro
+            </a>
+          </div>
+        </aside>
+
+        <!-- Main chat area -->
+        <main class="chat-main">
+          <div class="chat-header">
+            <div class="chat-header-left">
+              <div class="ai-avatar-sm" aria-hidden="true">
+                <svg viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="28">
+                  <path d="M16 1L30 9V27L16 35L2 27V9L16 1Z" stroke="url(#hg2)" stroke-width="1.5" fill="url(#hf2)"/>
+                  <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="white">L</text>
+                  <defs>
+                    <linearGradient id="hg2" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#4F8EF7"/><stop offset="100%" stop-color="#A855F7"/>
+                    </linearGradient>
+                    <linearGradient id="hf2" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#4F8EF7" stop-opacity="0.2"/><stop offset="100%" stop-color="#A855F7" stop-opacity="0.2"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div>
+                <div class="chat-ai-name">LuaForge AI</div>
+                <div class="chat-ai-status">
+                  <span class="status-dot" aria-hidden="true"></span>
+                  Online · Powered by Gemini
+                </div>
+              </div>
+            </div>
+            <div class="chat-header-right">
+              <button class="icon-btn" id="newChatBtn" title="New chat" aria-label="Start new chat">
+                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Chat messages">
+            <div class="msg-row ai-row" id="welcomeMsg">
+              <div class="msg-avatar ai-avatar" aria-hidden="true">
+                <i class="fa-solid fa-microchip"></i>
+              </div>
+              <div class="msg-body">
+                <div class="msg-name">LuaForge AI</div>
+                <div class="msg-bubble ai-bubble">
+                  <p>👋 Hey! I'm your AI Roblox scripting assistant.</p>
+                  <p>I can help you <strong>generate scripts</strong>, <strong>fix errors</strong>, and <strong>explain Lua concepts</strong>. What do you want to build today?</p>
+                </div>
+                <div class="quick-prompts" role="list" aria-label="Quick prompts">
+                  <button class="quick-chip" data-prompt="Make a sword combat system with damage, animations, and 1 second cooldown">⚔️ Sword combat</button>
+                  <button class="quick-chip" data-prompt="Create a tycoon money dropper that gives 10 cash every 5 seconds">💰 Money dropper</button>
+                  <button class="quick-chip" data-prompt="Explain how RemoteEvents work in Roblox">📡 RemoteEvents</button>
+                  <button class="quick-chip" data-prompt="Make a door that opens when a player touches it">🚪 Touch door</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <div class="chat-input-box">
+              <label for="chatInput" class="sr-only">Message LuaForge AI</label>
+              <textarea
+                id="chatInput"
+                class="chat-textarea"
+                placeholder="Ask LuaForge AI anything about Roblox scripting..."
+                rows="1"
+                aria-label="Type your message"
+              ></textarea>
+              <div class="chat-input-actions">
+                <button class="icon-btn save-prompt-btn" id="savePromptBtn" title="Save this prompt" aria-label="Save prompt">
+                  <i class="fa-regular fa-bookmark" aria-hidden="true"></i>
+                </button>
+                <button class="btn-send" id="sendChatBtn" aria-label="Send message">
+                  <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <div class="chat-footer-note" aria-label="Disclaimer">
+              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+              Always test AI-generated scripts in Roblox Studio before publishing.
+            </div>
+          </div>
+        </main>
+
+        <!-- Code panel (right) -->
+        <aside class="chat-code-panel" id="chatCodePanel" aria-label="Generated code panel">
+          <div class="code-panel-header">
+            <div class="code-dots" aria-hidden="true">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <span class="code-panel-filename" id="codePanelFilename">
+              <i class="fa-solid fa-file-code" aria-hidden="true"></i> <span>output.lua</span>
+            </span>
+            <button class="copy-btn" id="codePanelCopyBtn" aria-label="Copy code">
+              <i class="fa-regular fa-copy" aria-hidden="true"></i> <span>Copy</span>
+            </button>
+          </div>
+          <div class="code-panel-body">
+            <div class="code-panel-placeholder" id="codePanelPlaceholder">
+              <i class="fa-solid fa-code" aria-hidden="true"></i>
+              <span>Generated code will<br/>appear here</span>
+            </div>
+            <pre class="language-lua" id="codePanelPre" style="display:none;"><code id="codePanelCode"></code></pre>
+          </div>
+          <div class="code-panel-footer" id="codePanelFooter" style="display:none;">
+            <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Ready — paste into Studio</span>
+            <span id="genTime"></span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       TESTIMONIALS
+  ══════════════════════════════════════════ -->
+  <section class="testimonials-section" id="testimonials" aria-label="Testimonials">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label fade-up">Developer Reviews</div>
+        <h2 class="section-title fade-up delay-1">
+          Loved by Roblox<br/><span class="gradient-text">developers</span>
+        </h2>
+      </div>
+
+      <div class="testimonials-grid">
+        <article class="testimonial-card fade-up">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>"LuaForge AI saved me hours. I used to spend entire evenings debugging — now I paste the error and get the fix in seconds. Absolutely worth it."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background:linear-gradient(135deg,#4F8EF7,#A855F7)" aria-hidden="true">R</div>
+            <div>
+              <div class="author-name">RblxDev_Ryan</div>
+              <div class="author-role">Game Developer · 3 years on Roblox</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="testimonial-card fade-up delay-1">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>"I'm 14 and just started learning scripting. The Lua Tutor explains things better than any YouTube video I've watched. This tool is incredible."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background:linear-gradient(135deg,#22D3EE,#4F8EF7)" aria-hidden="true">S</div>
+            <div>
+              <div class="author-name">StarterScript_S</div>
+              <div class="author-role">Beginner Developer · Learning Lua</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="testimonial-card fade-up delay-2">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>"Generated a full tycoon system in under 5 minutes. It even added comments and error handling I didn't ask for. The Pro plan pays for itself."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background:linear-gradient(135deg,#A855F7,#EC4899)" aria-hidden="true">M</div>
+            <div>
+              <div class="author-name">MetaBuilds_M</div>
+              <div class="author-role">Studio Developer · 12 published games</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="testimonial-card fade-up delay-3">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <p>"The code quality is surprisingly clean. It follows Roblox best practices and uses proper services. Even my senior dev was impressed with the output."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444)" aria-hidden="true">K</div>
+            <div>
+              <div class="author-name">KodeKing_K</div>
+              <div class="author-role">Lead Scripter · Team of 4</div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       ROADMAP
+  ══════════════════════════════════════════ -->
+  <section class="roadmap-section" id="roadmap" aria-label="Product roadmap">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label fade-up">Coming Soon</div>
+        <h2 class="section-title fade-up delay-1">
+          What's on the<br/><span class="gradient-text">roadmap</span>
+        </h2>
+      </div>
+      <div class="roadmap-grid">
+        <div class="roadmap-card fade-up">
+          <div class="roadmap-icon"><i class="fa-solid fa-book"></i></div>
+          <h4>Script Library</h4>
+          <p>Browse and reuse hundreds of community-contributed Lua scripts.</p>
+          <span class="roadmap-status coming">Q3 2025</span>
+        </div>
+        <div class="roadmap-card fade-up delay-1">
+          <div class="roadmap-icon"><i class="fa-solid fa-gamepad"></i></div>
+          <h4>Game Templates</h4>
+          <p>Full starter kits for popular game genres: RPG, Tycoon, FPS, and more.</p>
+          <span class="roadmap-status coming">Q3 2025</span>
+        </div>
+        <div class="roadmap-card fade-up delay-2">
+          <div class="roadmap-icon"><i class="fa-solid fa-people-group"></i></div>
+          <h4>Team Projects</h4>
+          <p>Collaborate on scripts with your dev team. Shared history and permissions.</p>
+          <span class="roadmap-status planned">Q4 2025</span>
+        </div>
+        <div class="roadmap-card fade-up delay-3">
+          <div class="roadmap-icon"><i class="fa-solid fa-plug"></i></div>
+          <h4>Roblox Studio Plugin</h4>
+          <p>Generate and insert AI scripts directly inside Roblox Studio.</p>
+          <span class="roadmap-status planned">2026</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       PRICING
+  ══════════════════════════════════════════ -->
+  <section class="pricing-section" id="pricing" aria-label="Pricing">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-label fade-up">Pricing</div>
+        <h2 class="section-title fade-up delay-1">
+          Simple, <span class="gradient-text">transparent</span> pricing
+        </h2>
+        <p class="section-sub fade-up delay-2">
+          Start free. Upgrade when you're ready to build without limits.
+        </p>
+      </div>
+
+      <div class="pricing-toggle-wrap fade-up delay-3" role="group" aria-label="Billing cycle">
+        <button class="pricing-toggle active" data-billing="monthly" aria-pressed="true">Monthly</button>
+        <button class="pricing-toggle" data-billing="yearly" aria-pressed="false">
+          Yearly <span class="save-badge">Save 20%</span>
+        </button>
+      </div>
+
+      <div class="pricing-grid fade-up delay-4">
+        <!-- Free -->
+        <div class="pricing-card">
+          <div class="pricing-card-top">
+            <div class="plan-name">Free</div>
+            <div class="plan-price">
+              <span class="price-amt">$0</span>
+              <span class="price-per">/month</span>
+            </div>
+            <p class="plan-desc">Perfect for exploring AI scripting and getting started with Roblox development.</p>
+          </div>
+          <ul class="plan-features">
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> 5 script generations per day</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Basic Roblox Lua scripts</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Error fixer (3/day)</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Community Discord access</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Standard AI response speed</li>
+            <li class="feat-no"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Advanced game systems</li>
+            <li class="feat-no"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Saved chat history</li>
+            <li class="feat-no"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Priority AI speed</li>
+            <li class="feat-no"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Advanced debugging</li>
+          </ul>
+          <a href="#demo" class="btn-outline full-width" id="freeBtn" data-stripe="free">Start Free</a>
+        </div>
+
+        <!-- Pro -->
+        <div class="pricing-card featured">
+          <div class="popular-badge">
+            <i class="fa-solid fa-crown" aria-hidden="true"></i> Most Popular
+          </div>
+          <div class="pricing-card-top">
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">
+              <span class="price-amt" data-monthly="$10" data-yearly="$8">$10</span>
+              <span class="price-per">/month</span>
+            </div>
+            <p class="plan-desc">For serious Roblox developers who build fast and ship faster — no limits.</p>
+          </div>
+          <ul class="plan-features">
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> <strong>Unlimited</strong> script generations</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Advanced Roblox game systems</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> <strong>Unlimited</strong> error fixing</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> <strong>Priority</strong> AI response speed</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Saved chat history</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Advanced debugging tools</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Priority new features</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Premium Discord access</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Lua Tutor — full access</li>
+          </ul>
+          <a href="#" class="btn-primary full-width" id="proBtn" data-stripe="pro">
+            <i class="fa-solid fa-bolt" aria-hidden="true"></i> Get Pro
+          </a>
+        </div>
+
+        <!-- Yearly -->
+        <div class="pricing-card yearly-card">
+          <div class="save-ribbon">Save 20%</div>
+          <div class="pricing-card-top">
+            <div class="plan-name">Yearly</div>
+            <div class="plan-price">
+              <span class="price-amt">$100</span>
+              <span class="price-per">/year</span>
+            </div>
+            <p class="plan-desc">All Pro features. Billed annually at $100/year instead of $120.</p>
+          </div>
+          <ul class="plan-features">
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Everything in Pro</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> <strong>$20 saved</strong> vs monthly</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Early access to new features</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Exclusive yearly member badge</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Priority support queue</li>
+            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Unlimited history storage</li>
+          </ul>
+          <a href="#" class="btn-outline full-width yearly-btn" id="yearlyBtn" data-stripe="yearly">
+            <i class="fa-solid fa-calendar" aria-hidden="true"></i> Get Yearly Plan
+          </a>
+          <div class="yearly-note">≈ $8.33/month · Best value</div>
+        </div>
+      </div>
+
+      <div class="pricing-guarantee fade-up">
+        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        <span>7-day money back guarantee · Cancel anytime · No hidden fees</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       COMMUNITY / DISCORD
+  ══════════════════════════════════════════ -->
+  <section class="community-section" id="community" aria-label="Community">
+    <div class="container">
+      <div class="discord-card fade-up">
+        <div class="discord-glow" aria-hidden="true"></div>
+        <div class="discord-content">
+          <div class="discord-icon" aria-hidden="true">
+            <i class="fa-brands fa-discord"></i>
+          </div>
+          <div class="discord-text">
+            <h2>Join the LuaForge AI Discord</h2>
+            <p>Connect with 2,000+ Roblox developers. Share scripts, get feedback, and get help from the community.</p>
+            <ul class="discord-perks">
+              <li><i class="fa-solid fa-check"></i> Free help & script reviews</li>
+              <li><i class="fa-solid fa-check"></i> Exclusive tutorials & resources</li>
+              <li><i class="fa-solid fa-check"></i> Early access to new features</li>
+            </ul>
+          </div>
+          <a href="#" class="btn-discord" aria-label="Join our Discord server">
+            <i class="fa-brands fa-discord" aria-hidden="true"></i> Join Discord — It's Free
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       WAITLIST / EMAIL CAPTURE
+  ══════════════════════════════════════════ -->
+  <section class="waitlist-section" id="waitlist" aria-label="Early access signup">
+    <div class="container">
+      <div class="waitlist-card fade-up">
+        <div class="waitlist-badge">🚀 Early Access</div>
+        <h2>Get early access to new features</h2>
+        <p>Be the first to try the Script Library, Studio Plugin, and Team Projects. Join the waitlist.</p>
+        <form class="waitlist-form" id="waitlistForm" aria-label="Early access signup form">
+          <label for="waitlistEmail" class="sr-only">Email address</label>
+          <input
+            type="email"
+            id="waitlistEmail"
+            placeholder="your@email.com"
+            autocomplete="email"
+            aria-label="Your email address"
+            required
+          />
+          <button type="submit" class="btn-primary" id="waitlistBtn">
+            <i class="fa-solid fa-envelope" aria-hidden="true"></i> Get Early Access
+          </button>
+        </form>
+        <p class="waitlist-note" id="waitlistConfirm" style="display:none;">
+          <i class="fa-solid fa-circle-check"></i> You're on the list! We'll be in touch.
+        </p>
+        <p class="waitlist-disclaimer">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       CTA BANNER
+  ══════════════════════════════════════════ -->
+  <section class="cta-section" aria-label="Call to action">
+    <div class="container">
+      <div class="cta-card fade-up">
+        <div class="cta-glow" aria-hidden="true"></div>
+        <div class="cta-content">
+          <h2>Ready to build faster?</h2>
+          <p>Join 2,000+ Roblox developers already using LuaForge AI to script smarter.</p>
+          <div class="cta-btns">
+            <a href="#demo" class="btn-primary btn-large">
+              <i class="fa-solid fa-bolt" aria-hidden="true"></i> Try AI Now — It's Free
+            </a>
+            <a href="#" class="btn-ghost-white">
+              <i class="fa-brands fa-discord" aria-hidden="true"></i> Join Discord
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════ -->
+  <footer class="footer" aria-label="Site footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#" class="nav-logo" aria-label="LuaForge AI home">
+            <svg class="logo-hex" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M16 1L30 9V27L16 35L2 27V9L16 1Z" stroke="url(#fhg)" stroke-width="1.5" fill="url(#fhf)"/>
+              <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="white">L</text>
+              <defs>
+                <linearGradient id="fhg" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#4F8EF7"/><stop offset="100%" stop-color="#A855F7"/>
+                </linearGradient>
+                <linearGradient id="fhf" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#4F8EF7" stop-opacity="0.15"/><stop offset="100%" stop-color="#A855F7" stop-opacity="0.15"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <span class="logo-text">LuaForge <span class="logo-ai">AI</span></span>
+          </a>
+          <p>AI-powered Roblox scripting assistant.<br/>Build faster. Ship smarter.</p>
+          <p class="roblox-disclaimer">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            Not affiliated with Roblox Corporation.
+          </p>
+          <nav class="social-links" aria-label="Social media links">
+            <a href="#" aria-label="Twitter/X"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
+            <a href="#" aria-label="Discord"><i class="fa-brands fa-discord" aria-hidden="true"></i></a>
+            <a href="#" aria-label="GitHub"><i class="fa-brands fa-github" aria-hidden="true"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
+          </nav>
+        </div>
+
+        <nav class="footer-links" aria-label="Footer navigation">
+          <div class="footer-col">
+            <h4>Product</h4>
+            <a href="#features">Features</a>
+            <a href="#tools">Tools</a>
+            <a href="#demo">AI Demo</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#roadmap">Roadmap</a>
+          </div>
+          <div class="footer-col">
+            <h4>Resources</h4>
+            <a href="#">Documentation</a>
+            <a href="#">Lua Guide</a>
+            <a href="#">Blog</a>
+            <a href="#">Status</a>
+            <a href="#">Changelog</a>
+          </div>
+          <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Service</a>
+            <a href="#">Cookie Policy</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+          </div>
+        </nav>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2025 LuaForge AI. All rights reserved.</span>
+        <span class="footer-disclaimer">
+          AI-generated scripts should always be tested before use. LuaForge AI is not affiliated with Roblox Corporation.
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════
+       FEEDBACK BUTTON
+  ══════════════════════════════════════════ -->
+  <div class="feedback-btn-wrap" id="feedbackWrap">
+    <button class="feedback-btn" id="feedbackBtn" aria-label="Report a bug or suggest a feature">
+      <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
+      <span>Feedback</span>
     </button>
-
-    <!-- Email status indicator -->
-    <div id="emailStatus" style="font-size:12px;color:var(--muted);text-align:center;min-height:18px"></div>
-
-    <!-- Fallback / dev box — only shown if email sending fails -->
-    <div class="demo-email-box" id="demoBox" style="display:none">
-      <div class="demo-email-label">
-        📧 Fallback Code <span class="demo-badge">EMAIL FAILED</span>
+    <div class="feedback-modal" id="feedbackModal" role="dialog" aria-label="Send feedback" aria-modal="true" style="display:none;">
+      <div class="feedback-modal-header">
+        <span>Send Feedback</span>
+        <button class="feedback-close" id="feedbackClose" aria-label="Close feedback">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
-      <div class="demo-email-code" id="demoCode">------</div>
-      <div class="demo-email-note">Could not send the email. Use this code to continue.</div>
-      <button class="btn-yellow" onclick="autofillCode()" style="margin-top:8px;padding:9px;font-size:13px">Autofill Code ↗</button>
-    </div>
-
-    <div class="resend-row">
-      Didn't get it? <span class="resend-link" onclick="resendCode()">Resend code</span>
-    </div>
-    <button class="btn-ghost" onclick="goBackFromVerify()" style="margin-top:4px">← Go back</button>
-  </div>
-</div>
-
-<!-- ══ USERNAME SCREEN (post-login new user) ══ -->
-<div id="usernameScreen">
-  <div class="username-card">
-    <div id="setupAvatarWrap"></div>
-    <div class="un-title">Choose your username</div>
-    <div class="un-sub">Pick a unique handle so friends can find you.</div>
-    <input class="setup-input" id="usernameInput" placeholder="@username" maxlength="20"
-      oninput="onUsernameInputType(this.value)"
-      onkeydown="if(event.key==='Enter')saveUsername()">
-    <div class="un-status" id="usernameStatus"></div>
-    <button class="btn-yellow" id="saveUsernameBtn" onclick="saveUsername()" disabled>Claim Username →</button>
-  </div>
-</div>
-
-<!-- ══ MAIN APP ══ -->
-<div id="mainApp">
-  <div class="layout">
-    <div class="sidebar">
-      <div class="sidebar-top">
-        <div class="logo-row">
-          <div class="logo-left">
-            <div class="logo-ghost">👻</div>
-            <span class="logo-text">Tolara</span>
-          </div>
-          <div style="display:flex;gap:6px;align-items:center;position:relative">
-            <div id="myMenuBtn" class="user-menu-btn" onclick="toggleMenu()"></div>
-            <div id="userDropdown" class="dropdown" style="display:none">
-              <div class="dropdown-item" id="myUsernameLabel" style="color:var(--yellow)"></div>
-              <div class="dropdown-item danger" onclick="doSignOut()">🚪 Sign out</div>
-            </div>
-          </div>
-        </div>
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input class="search-input" id="sidebarSearch" placeholder="Search chats..." oninput="onSidebarSearch(this.value)">
-        </div>
+      <div class="feedback-options">
+        <button class="feedback-option" data-type="bug">
+          <i class="fa-solid fa-bug"></i> Report a Bug
+        </button>
+        <button class="feedback-option" data-type="feature">
+          <i class="fa-solid fa-lightbulb"></i> Suggest a Feature
+        </button>
       </div>
-      <div class="tabs">
-        <div class="tab active" id="tabChats" onclick="showTab('chats')">💬 Chats</div>
-        <div class="tab" id="tabSearchPeople" onclick="showTab('search')">🔎 Find People</div>
-      </div>
-      <div class="list-wrap" id="listWrap"></div>
-    </div>
-    <div class="chat" id="chatPane">
-      <div class="empty-chat">
-        <div class="empty-ghost">👻</div>
-        <div style="font-size:15px;font-weight:800">Select a chat to start snapping</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px">Use 🔎 Find People to search by username</div>
-      </div>
+      <textarea id="feedbackText" class="feedback-textarea" placeholder="Describe your bug or feature idea..." aria-label="Your feedback"></textarea>
+      <button class="btn-primary full-width" id="feedbackSubmit">
+        <i class="fa-solid fa-paper-plane"></i> Send Feedback
+      </button>
+      <p class="feedback-confirm" id="feedbackConfirm" style="display:none;">
+        <i class="fa-solid fa-circle-check"></i> Thanks! We'll review your feedback.
+      </p>
     </div>
   </div>
-</div>
 
-<div class="toast" id="toast"></div>
-<div class="img-viewer" id="imgViewer" style="display:none" onclick="this.style.display='none'">
-  <img id="imgViewerImg" src="" alt="">
-</div>
-<input type="file" id="fileInput" accept="image/*" onchange="handleImageFile(event)">
-
-<script>
-// ════════════════════════════════════════════════
-//  LOCAL DATABASE (localStorage)
-// ════════════════════════════════════════════════
-const DB = {
-  getUsers()         { return JSON.parse(localStorage.getItem('tolara_users') || '{}'); },
-  setUsers(u)        { localStorage.setItem('tolara_users', JSON.stringify(u)); },
-  getUser(uid)       { return this.getUsers()[uid] || null; },
-  saveUser(uid, d)   { const u=this.getUsers(); u[uid]={...(u[uid]||{}), ...d}; this.setUsers(u); },
-
-  getUsernames()          { return JSON.parse(localStorage.getItem('tolara_usernames') || '{}'); },
-  usernameToUid(name)     { return (this.getUsernames()[name.toLowerCase()] || null); },
-  claimUsername(name,uid) { const u=this.getUsernames(); u[name.toLowerCase()]=uid; localStorage.setItem('tolara_usernames', JSON.stringify(u)); },
-  isUsernameTaken(name)   { return !!this.usernameToUid(name); },
-
-  getConversations()        { return JSON.parse(localStorage.getItem('tolara_convs') || '{}'); },
-  getConv(cid)              { return this.getConversations()[cid] || null; },
-  saveConv(cid, data)       { const c=this.getConversations(); c[cid]={...(c[cid]||{}), ...data}; localStorage.setItem('tolara_convs', JSON.stringify(c)); },
-  addMessage(cid, parts, m) {
-    const c = this.getConversations();
-    if (!c[cid]) c[cid] = {participants: parts, messages:[], lastMessage:'', lastTime:null, lastSenderId:''};
-    c[cid].messages.push(m);
-    c[cid].lastMessage = m.text || '📸 Image';
-    c[cid].lastTime = Date.now();
-    c[cid].lastSenderId = m.senderId;
-    localStorage.setItem('tolara_convs', JSON.stringify(c));
-  },
-
-  getSession()     { return localStorage.getItem('tolara_session'); },
-  setSession(uid)  { localStorage.setItem('tolara_session', uid); },
-  clearSession()   { localStorage.removeItem('tolara_session'); },
-
-  getCodes()           { return JSON.parse(localStorage.getItem('tolara_codes') || '{}'); },
-  storeCode(email, code, userData) {
-    const codes = this.getCodes();
-    codes[email.toLowerCase()] = { code, expires: Date.now() + 600000, userData };
-    localStorage.setItem('tolara_codes', JSON.stringify(codes));
-  },
-  verifyCode(email, code) {
-    const codes = this.getCodes();
-    const e = codes[email.toLowerCase()];
-    if (!e) return { ok: false, error: 'No code found. Try resending.' };
-    if (Date.now() > e.expires) return { ok: false, error: 'Code expired. Please resend.' };
-    if (e.code !== code.trim()) return { ok: false, error: 'Incorrect code. Try again.' };
-    delete codes[email.toLowerCase()];
-    localStorage.setItem('tolara_codes', JSON.stringify(codes));
-    return { ok: true, userData: e.userData };
-  }
-};
-
-// ════════════════════════════════════════════════
-//  HELPERS
-// ════════════════════════════════════════════════
-function genUID()  { return 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36); }
-function genCode() { return Math.floor(100000 + Math.random() * 900000).toString(); }
-function hashPw(p) {
-  let h = 5381;
-  for (let i = 0; i < p.length; i++) h = ((h<<5)+h) + p.charCodeAt(i);
-  return 'h_' + Math.abs(h).toString(36);
-}
-function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-const COLORS = ['#FF6B6B','#3478F6','#BF5AF2','#FF9F0A','#4CD964','#FF375F','#00C7BE','#5AC8FA'];
-const colorFor = s => { let h=0; for(let i=0;i<s.length;i++) h=s.charCodeAt(i)+((h<<5)-h); return COLORS[Math.abs(h)%COLORS.length]; };
-const initFor  = n => (n||'??').slice(0,2).toUpperCase();
-const timeStr  = ts => { const d=new Date(ts||Date.now()); return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); };
-const convIdFor = (a,b) => [a,b].sort().join('_');
-const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-// ════════════════════════════════════════════════
-//  APP STATE
-// ════════════════════════════════════════════════
-let currentUser   = null;
-let myProfile     = null;
-let friends       = {};
-let conversations = {};
-let activeUid     = null;
-let currentTab    = 'chats';
-let menuOpen      = false;
-let usernameValid = false;
-let unCheckTimer  = null;
-let pendingVerify = null; // { type:'signup'|'login', email, userData }
-let currentCode   = null;
-let pollInterval  = null;
-let presenceInterval = null;
-
-// BroadcastChannel for cross-tab real-time
-const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('tolara_realtime') : null;
-if (bc) {
-  bc.onmessage = e => {
-    if (!currentUser) return;
-    if (e.data.type === 'message' && e.data.cid) {
-      if (activeUid && convIdFor(currentUser.uid, activeUid) === e.data.cid) {
-        renderMessages(activeUid);
-        scrollBottom();
-      }
-      updateSidebarList();
-    }
-    if (e.data.type === 'presence') updateSidebarList();
-  };
-}
-
-// ════════════════════════════════════════════════
-//  INIT
-// ════════════════════════════════════════════════
-window.addEventListener('load', () => {
-  const uid = DB.getSession();
-  if (uid) {
-    const user = DB.getUser(uid);
-    if (user && user.username) {
-      currentUser = { uid };
-      myProfile = user;
-      DB.saveUser(uid, { online: true, lastSeen: Date.now() });
-      bc?.postMessage({ type: 'presence' });
-      launchApp();
-    } else if (user) {
-      currentUser = { uid };
-      myProfile = user;
-      showScreen('username');
-    } else {
-      showScreen('auth');
-    }
-  } else {
-    showScreen('auth');
-  }
-});
-
-window.addEventListener('beforeunload', () => {
-  if (currentUser) DB.saveUser(currentUser.uid, { online: false });
-  bc?.postMessage({ type: 'presence' });
-  bc?.close();
-});
-
-// ════════════════════════════════════════════════
-//  AUTH TAB SWITCH
-// ════════════════════════════════════════════════
-function switchAuthTab(tab) {
-  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
-  document.getElementById('tabSignup').classList.toggle('active', tab==='signup');
-  document.getElementById('loginMode').style.display  = tab==='login'  ? 'block' : 'none';
-  document.getElementById('signupMode').style.display = tab==='signup' ? 'block' : 'none';
-  document.getElementById('loginErr').textContent = '';
-}
-
-// ════════════════════════════════════════════════
-//  LOGIN
-// ════════════════════════════════════════════════
-function doLogin() {
-  const ident = document.getElementById('loginIdent').value.trim();
-  const pass  = document.getElementById('loginPass').value;
-  const err   = document.getElementById('loginErr');
-  const btn   = document.getElementById('loginBtn');
-  err.textContent = '';
-
-  if (!ident) { err.textContent = 'Enter your email or username'; return; }
-  if (!pass)  { err.textContent = 'Enter your password'; return; }
-
-  btn.disabled = true;
-  btn.textContent = 'Signing in…';
-
-  const users = DB.getUsers();
-  let user = null;
-
-  if (ident.includes('@')) {
-    user = Object.values(users).find(u => u.email === ident.toLowerCase());
-  } else {
-    const uid = DB.usernameToUid(ident);
-    user = uid ? users[uid] : null;
-  }
-
-  if (!user) {
-    err.textContent = 'Account not found. Check your email or username.';
-    btn.disabled = false; btn.textContent = 'Log In →'; return;
-  }
-  if (user.passwordHash !== hashPw(pass)) {
-    err.textContent = 'Incorrect password.';
-    btn.disabled = false; btn.textContent = 'Log In →'; return;
-  }
-
-  // Send login verification code
-  const loginCode = genCode();
-  DB.storeCode(user.email, loginCode, { type: 'login', uid: user.uid });
-  pendingVerify = { type: 'login', email: user.email, uid: user.uid, name: user.name || user.displayName || '' };
-
-  document.getElementById('verifyEmailLabel').textContent = user.email;
-  document.getElementById('emailStatus').textContent = '';
-  document.getElementById('demoBox').style.display = 'none';
-  clearOtpBoxes();
-
-  btn.disabled = false; btn.textContent = 'Log In →';
-  showScreen('verify');
-  sendVerificationEmail(user.email, loginCode, user.name || user.displayName || '');
-}
-
-// ════════════════════════════════════════════════
-//  SIGNUP STEPS
-// ════════════════════════════════════════════════
-let signupData = {};
-let signupStep = 1;
-
-function switchSignupStep(step) {
-  document.querySelectorAll('.signup-step').forEach((el,i) => {
-    el.classList.toggle('active', i+1 === step);
-  });
-  for (let i = 0; i < 4; i++) {
-    document.getElementById('dot'+i).classList.toggle('done', i < step);
-  }
-  signupStep = step;
-}
-
-function signupNext(from) {
-  document.getElementById('step'+from+'Err').textContent = '';
-
-  if (from === 1) {
-    const first = document.getElementById('signupFirst').value.trim();
-    const last  = document.getElementById('signupLast').value.trim();
-    if (!first || !last) { document.getElementById('step1Err').textContent = 'Please enter your full name.'; return; }
-    signupData.name = first + ' ' + last;
-    switchSignupStep(2);
-    setTimeout(() => document.getElementById('signupEmail').focus(), 50);
-
-  } else if (from === 2) {
-    const email = document.getElementById('signupEmail').value.trim().toLowerCase();
-    if (!isValidEmail(email)) { document.getElementById('step2Err').textContent = 'Enter a valid email address.'; return; }
-    if (Object.values(DB.getUsers()).find(u => u.email === email)) {
-      document.getElementById('step2Err').textContent = 'An account with this email already exists.'; return;
-    }
-    signupData.email = email;
-    switchSignupStep(3);
-    setTimeout(() => document.getElementById('signupPass').focus(), 50);
-
-  } else if (from === 3) {
-    const pw1 = document.getElementById('signupPass').value;
-    const pw2 = document.getElementById('signupPass2').value;
-    if (pw1.length < 8) { document.getElementById('step3Err').textContent = 'Password must be at least 8 characters.'; return; }
-    if (pw1 !== pw2) { document.getElementById('step3Err').textContent = "Passwords don't match."; return; }
-    signupData.password = pw1;
-    switchSignupStep(4);
-    setTimeout(() => document.getElementById('signupUsername').focus(), 50);
-
-  } else if (from === 4) {
-    if (!usernameValid) { document.getElementById('step4Err').textContent = 'Choose a valid, available username.'; return; }
-    signupData.username = document.getElementById('signupUsername').value.trim().toLowerCase();
-
-    // Send verification code
-    const signupCode = genCode();
-    DB.storeCode(signupData.email, signupCode, { type: 'signup', ...signupData });
-    pendingVerify = { type: 'signup', email: signupData.email, name: signupData.name || '' };
-
-    document.getElementById('verifyEmailLabel').textContent = signupData.email;
-    document.getElementById('emailStatus').textContent = '';
-    document.getElementById('demoBox').style.display = 'none';
-    clearOtpBoxes();
-    showScreen('verify');
-    sendVerificationEmail(signupData.email, signupCode, signupData.name || '');
-  }
-}
-
-function signupBack(from) {
-  if (from === 2) switchSignupStep(1);
-  else if (from === 3) switchSignupStep(2);
-  else if (from === 4) switchSignupStep(3);
-}
-
-// Password strength
-function checkPwStrength(pw) {
-  const bars = ['pb1','pb2','pb3'];
-  let strength = 0;
-  if (pw.length >= 8) strength++;
-  if (/[A-Z]/.test(pw) || /[0-9]/.test(pw)) strength++;
-  if (/[^a-zA-Z0-9]/.test(pw) || pw.length >= 12) strength++;
-  bars.forEach((id, i) => {
-    const b = document.getElementById(id);
-    b.className = 'pw-bar';
-    if (i < strength) b.classList.add(strength===1?'weak':strength===2?'medium':'strong');
-  });
-}
-
-// Username check (for signup step 4)
-function onUsernameType(val) {
-  const clean = val.toLowerCase().replace(/[^a-z0-9_.]/g,'');
-  document.getElementById('signupUsername').value = clean;
-  clearTimeout(unCheckTimer);
-  usernameValid = false;
-  document.getElementById('usernameNextBtn').disabled = true;
-  const hint = document.getElementById('usernameHint');
-  if (!clean) { hint.textContent=''; hint.className='field-hint'; return; }
-  if (clean.length < 3) { hint.textContent='Too short (min 3)'; hint.className='field-hint err'; return; }
-  hint.innerHTML='<span class="spinner"></span> Checking…';
-  hint.className='field-hint checking';
-  unCheckTimer = setTimeout(() => {
-    if (DB.isUsernameTaken(clean)) {
-      hint.textContent='❌ @'+clean+' is taken';
-      hint.className='field-hint err';
-    } else {
-      hint.textContent='✅ @'+clean+' is available!';
-      hint.className='field-hint ok';
-      usernameValid = true;
-      document.getElementById('usernameNextBtn').disabled = false;
-    }
-  }, 400);
-}
-
-// ════════════════════════════════════════════════
-//  EMAILJS CONFIG — fill these in with your details
-//  Sign up free at https://www.emailjs.com
-// ════════════════════════════════════════════════
-const EMAILJS_PUBLIC_KEY  = 'ze1GuMmO3H2tsT8j3';
-const EMAILJS_SERVICE_ID  = 'service_iaweosd';
-const EMAILJS_TEMPLATE_ID = 'template_jo9i3cf';
-
-// Initialise EmailJS (safe to call even before DOM ready)
-if (typeof emailjs !== 'undefined') {
-  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-}
-
-async function sendVerificationEmail(toEmail, code, userName) {
-  const statusEl = document.getElementById('emailStatus');
-  const demoBox  = document.getElementById('demoBox');
-  statusEl.textContent = '📨 Sending verification email…';
-
-  // Store code always (needed for verify step)
-  currentCode = code;
-
-  // If EmailJS is missing or keys are not configured, fall back to demo box immediately
-  if (typeof emailjs === 'undefined' || EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
-    statusEl.textContent = '⚠️ Email sending is not available — using fallback code below.';
-    document.getElementById('demoCode').textContent = code;
-    demoBox.style.display = 'block';
-    return;
-  }
-
-  try {
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email:   toEmail,
-      to_name:    userName || toEmail,
-      otp_code:   code,
-      app_name:   'Tolara',
-    });
-    statusEl.innerHTML = '✅ Code sent to <strong style="color:var(--yellow)">' + toEmail + '</strong>';
-    demoBox.style.display = 'none';
-  } catch (err) {
-    console.error('EmailJS error:', err);
-    statusEl.textContent = '⚠️ Could not send email — use the code below.';
-    document.getElementById('demoCode').textContent = code;
-    demoBox.style.display = 'block';
-  }
-}
-
-// ════════════════════════════════════════════════
-//  OTP / VERIFICATION
-// ════════════════════════════════════════════════
-function getOtpBoxes() { return Array.from(document.querySelectorAll('.otp-box')); }
-
-function clearOtpBoxes() {
-  getOtpBoxes().forEach(b => { b.value=''; b.classList.remove('filled'); });
-  document.getElementById('otpErr').textContent = '';
-  document.getElementById('verifyBtn').disabled = true;
-}
-
-function otpInput(el, idx) {
-  const boxes = getOtpBoxes();
-  el.value = el.value.replace(/[^0-9]/g,'').slice(0,1);
-  el.classList.toggle('filled', !!el.value);
-  if (el.value && idx < 5) boxes[idx+1].focus();
-  // Enable/disable verify button based on whether all boxes filled
-  const allFilled = boxes.every(b => b.value);
-  document.getElementById('verifyBtn').disabled = !allFilled;
-}
-
-function otpKeydown(e, idx) {
-  const boxes = getOtpBoxes();
-  if (e.key === 'Backspace' && !boxes[idx].value && idx > 0) {
-    boxes[idx-1].focus();
-    // Re-check button state
-    document.getElementById('verifyBtn').disabled = true;
-  }
-  if (e.key.toLowerCase() === 'v' && (e.ctrlKey || e.metaKey)) {
-    e.preventDefault();
-    navigator.clipboard.readText().then(text => {
-      const digits = text.replace(/\D/g,'').slice(0,6);
-      if (digits.length === 6) {
-        digits.split('').forEach((d,i) => { boxes[i].value=d; boxes[i].classList.add('filled'); });
-        document.getElementById('verifyBtn').disabled = false;
-      }
-    }).catch(()=>{});
-  }
-}
-
-function autofillCode() {
-  const code = document.getElementById('demoCode').textContent;
-  if (!code || code === '------') return;
-  const boxes = getOtpBoxes();
-  code.split('').forEach((d,i) => { boxes[i].value=d; boxes[i].classList.add('filled'); });
-  document.getElementById('verifyBtn').disabled = false;
-}
-
-function submitOtp() {
-  const boxes = getOtpBoxes();
-  const code = boxes.map(b=>b.value).join('');
-  if (code.length !== 6) return;
-
-  const errEl = document.getElementById('otpErr');
-  errEl.textContent = '';
-
-  // Check against the stored code directly
-  if (code !== currentCode) {
-    errEl.textContent = 'Incorrect code. Try again.';
-    // Shake the boxes
-    boxes.forEach(b => { b.classList.add('invalid'); setTimeout(() => b.classList.remove('invalid'), 600); });
-    return;
-  }
-
-  // Also verify via DB (checks expiry)
-  const result = DB.verifyCode(pendingVerify.email, code);
-  if (!result.ok) { errEl.textContent = result.error; return; }
-
-  const userData = result.userData;
-
-  if (userData.type === 'signup') {
-    const uid = genUID();
-    DB.saveUser(uid, {
-      uid,
-      name: userData.name,
-      displayName: userData.name,
-      email: userData.email,
-      passwordHash: hashPw(userData.password),
-      username: userData.username,
-      friends: [],
-      online: true,
-      lastSeen: Date.now(),
-      createdAt: Date.now()
-    });
-    DB.claimUsername(userData.username, uid);
-    DB.setSession(uid);
-    currentUser = { uid };
-    myProfile = DB.getUser(uid);
-    pendingVerify = null;
-    currentCode = null;
-    launchApp();
-
-  } else if (userData.type === 'login') {
-    DB.saveUser(userData.uid, { online: true, lastSeen: Date.now() });
-    DB.setSession(userData.uid);
-    currentUser = { uid: userData.uid };
-    myProfile = DB.getUser(userData.uid);
-    pendingVerify = null;
-    currentCode = null;
-    if (myProfile.username) {
-      launchApp();
-    } else {
-      showScreen('username');
-    }
-  }
-}
-
-function resendCode() {
-  if (!pendingVerify) return;
-  const newCode = genCode();
-  const emailKey = pendingVerify.email.toLowerCase();
-  const existingUserData = DB.getCodes()[emailKey]?.userData;
-  DB.storeCode(pendingVerify.email, newCode, existingUserData || pendingVerify);
-  clearOtpBoxes();
-  document.getElementById('demoBox').style.display = 'none';
-  sendVerificationEmail(pendingVerify.email, newCode, pendingVerify.name || '');
-  showToast('New code sent!');
-}
-
-function goBackFromVerify() {
-  const type = pendingVerify?.type;
-  pendingVerify = null;
-  currentCode = null;
-  showScreen('auth');
-  switchAuthTab(type === 'signup' ? 'signup' : 'login');
-}
-
-// ════════════════════════════════════════════════
-//  USERNAME SCREEN (post-Google-style login)
-// ════════════════════════════════════════════════
-let unInputTimer = null;
-let unInputValid = false;
-
-function onUsernameInputType(val) {
-  const clean = val.toLowerCase().replace(/[^a-z0-9_.]/g,'');
-  document.getElementById('usernameInput').value = clean;
-  clearTimeout(unInputTimer);
-  unInputValid = false;
-  document.getElementById('saveUsernameBtn').disabled = true;
-  const status = document.getElementById('usernameStatus');
-  if (!clean) { status.textContent=''; status.className='un-status'; return; }
-  if (clean.length < 3) { status.textContent='Too short (min 3 chars)'; status.className='un-status err'; return; }
-  status.innerHTML='<span class="spinner"></span> Checking…'; status.className='un-status checking';
-  unInputTimer = setTimeout(() => {
-    if (DB.isUsernameTaken(clean)) {
-      status.textContent='❌ @'+clean+' is taken'; status.className='un-status err';
-      document.getElementById('usernameInput').className='setup-input invalid';
-    } else {
-      status.textContent='✅ @'+clean+' is available!'; status.className='un-status ok';
-      document.getElementById('usernameInput').className='setup-input valid';
-      unInputValid = true;
-      document.getElementById('saveUsernameBtn').disabled = false;
-    }
-  }, 400);
-}
-
-function saveUsername() {
-  if (!unInputValid || !currentUser) return;
-  const username = document.getElementById('usernameInput').value.trim().toLowerCase();
-  const btn = document.getElementById('saveUsernameBtn');
-  btn.disabled = true; btn.textContent = 'Saving…';
-  if (DB.isUsernameTaken(username)) {
-    showToast('Username just got taken! Try another.');
-    btn.disabled = false; btn.textContent = 'Claim Username →'; return;
-  }
-  DB.claimUsername(username, currentUser.uid);
-  DB.saveUser(currentUser.uid, { username, online: true, lastSeen: Date.now() });
-  myProfile = DB.getUser(currentUser.uid);
-  launchApp();
-}
-
-// ════════════════════════════════════════════════
-//  SIGN OUT
-// ════════════════════════════════════════════════
-function doSignOut() {
-  toggleMenu();
-  if (currentUser) DB.saveUser(currentUser.uid, { online: false });
-  bc?.postMessage({ type: 'presence' });
-  DB.clearSession();
-  currentUser = null; myProfile = null; friends = {}; conversations = {}; activeUid = null;
-  clearInterval(pollInterval);
-  clearInterval(presenceInterval);
-  signupData = {}; signupStep = 1;
-  switchSignupStep(1);
-  switchAuthTab('login');
-  document.getElementById('loginIdent').value = '';
-  document.getElementById('loginPass').value = '';
-  showScreen('auth');
-}
-
-function toggleMenu() {
-  menuOpen = !menuOpen;
-  document.getElementById('userDropdown').style.display = menuOpen ? 'block' : 'none';
-}
-document.addEventListener('click', e => {
-  const btn = document.getElementById('myMenuBtn');
-  const drop = document.getElementById('userDropdown');
-  if (menuOpen && btn && !btn.contains(e.target) && drop && !drop.contains(e.target)) {
-    menuOpen = false;
-    drop.style.display = 'none';
-  }
-});
-
-// ════════════════════════════════════════════════
-//  LAUNCH APP
-// ════════════════════════════════════════════════
-function launchApp() {
-  // Update menu button
-  const btn = document.getElementById('myMenuBtn');
-  const c = colorFor(currentUser.uid);
-  btn.style.background = c + '33';
-  btn.style.color = c;
-  btn.textContent = initFor(myProfile.displayName || myProfile.name);
-
-  document.getElementById('myUsernameLabel').textContent = '@' + myProfile.username;
-  document.getElementById('sidebarSearch').value = '';
-
-  loadConversations();
-  showScreen('main');
-  updateSidebarList();
-
-  // Poll for updates every 2 seconds (for cross-tab when BroadcastChannel not used)
-  clearInterval(pollInterval);
-  pollInterval = setInterval(() => {
-    if (activeUid) renderMessages(activeUid);
-    updateSidebarList();
-  }, 2000);
-
-  // Mark online periodically
-  clearInterval(presenceInterval);
-  presenceInterval = setInterval(() => {
-    if (currentUser) DB.saveUser(currentUser.uid, { online: true, lastSeen: Date.now() });
-  }, 30000);
-}
-
-// ════════════════════════════════════════════════
-//  CONVERSATIONS
-// ════════════════════════════════════════════════
-function loadConversations() {
-  if (!currentUser) return;
-  const convs = DB.getConversations();
-  conversations = {};
-  Object.entries(convs).forEach(([cid, conv]) => {
-    if (!Array.isArray(conv.participants) || !conv.participants.includes(currentUser.uid)) return;
-    const otherUid = conv.participants.find(uid => uid !== currentUser.uid);
-    if (!otherUid) return;
-    conversations[otherUid] = { convId: cid, ...conv };
-    // Load friend profile
-    if (!friends[otherUid]) {
-      const f = DB.getUser(otherUid);
-      if (f) friends[otherUid] = f;
-    }
-  });
-}
-
-function updateSidebarList() {
-  if (!currentUser || currentTab !== 'chats') return;
-  loadConversations(); // reload fresh
-
-  const wrap = document.getElementById('listWrap');
-  const query = document.getElementById('sidebarSearch').value.trim().toLowerCase();
-
-  const entries = Object.entries(conversations)
-    .filter(([uid]) => {
-      if (!query) return true;
-      const f = friends[uid];
-      return (f?.username||'').toLowerCase().includes(query) || (f?.name||f?.displayName||'').toLowerCase().includes(query);
-    })
-    .sort(([,a],[,b]) => (b.lastTime||0) - (a.lastTime||0));
-
-  if (!entries.length) {
-    wrap.innerHTML = '<div class="empty-list">No conversations yet.<br>Use 🔎 Find People to start one!</div>';
-    return;
-  }
-
-  wrap.innerHTML = '';
-  entries.forEach(([uid, conv]) => {
-    const f = friends[uid];
-    if (!f) return;
-    const c = colorFor(uid);
-    const isOnline = f.online && (Date.now() - (f.lastSeen||0)) < 60000;
-    const isMine = conv.lastSenderId === currentUser.uid;
-    const lastMsg = conv.lastMessage ? (isMine?'You: ':'')+conv.lastMessage : 'Say hello!';
-    const lastTime = conv.lastTime ? timeStr(conv.lastTime) : '';
-
-    const div = document.createElement('div');
-    div.className = 'convo-item' + (activeUid===uid?' active':'');
-    div.onclick = () => openChat(uid);
-    div.innerHTML = `
-      <div class="av" style="background:${c}22;color:${c}">
-        ${initFor(f.name||f.displayName)}
-        ${isOnline?'<div class="online-dot"></div>':''}
-      </div>
-      <div class="ci">
-        <div class="cn">${esc(f.name||f.username)}</div>
-        <div class="cp">${esc(lastMsg)}</div>
-      </div>
-      <div class="cr"><div class="ct">${lastTime}</div></div>`;
-    wrap.appendChild(div);
-  });
-}
-
-// ════════════════════════════════════════════════
-//  OPEN CHAT
-// ════════════════════════════════════════════════
-function openChat(uid) {
-  activeUid = uid;
-  const f = friends[uid];
-  if (!f) return;
-  const c = colorFor(uid);
-  const isOnline = f.online && (Date.now() - (f.lastSeen||0)) < 60000;
-
-  updateSidebarList();
-
-  const pane = document.getElementById('chatPane');
-  pane.innerHTML = `
-    <div class="chat-hdr">
-      <div class="hav" style="background:${c}22;color:${c}">${initFor(f.name||f.displayName)}</div>
-      <div class="hi">
-        <div class="hn">${esc(f.name||f.username)}</div>
-        <div class="hs">@${esc(f.username)} · ${isOnline?'<span style="color:var(--green)">Online</span>':'Last seen '+timeStr(f.lastSeen)}</div>
-      </div>
+  <!-- ══════════════════════════════════════════
+       AI BUSY TOAST
+  ══════════════════════════════════════════ -->
+  <div class="toast-wrap" id="toastWrap" aria-live="assertive" aria-atomic="true">
+    <div class="toast" id="toast">
+      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+      <span id="toastMsg">AI is busy. Try again in a few seconds.</span>
     </div>
-    <div class="msgs" id="msgs"></div>
-    <div class="input-bar">
-      <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Send image">📎</button>
-      <input class="chat-input" id="chatInput" placeholder="Send a snap…"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}">
-      <button class="send-btn" onclick="sendMsg()">➤</button>
-    </div>`;
+  </div>
 
-  renderMessages(uid);
-  scrollBottom();
-}
+  <!-- Screen-reader utility -->
+  <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}</style>
 
-function renderMessages(uid) {
-  if (activeUid !== uid) return;
-  const cid = convIdFor(currentUser.uid, uid);
-  const conv = DB.getConv(cid);
-  const msgs = conv?.messages || [];
-  const list = document.getElementById('msgs');
-  if (!list) return;
+  <!-- Prism.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
 
-  const scrolledToBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
-
-  list.innerHTML = '';
-  msgs.forEach(msg => appendMsgEl(uid, msg, list));
-
-  if (scrolledToBottom) scrollBottom();
-}
-
-function appendMsgEl(uid, msg, list) {
-  const mine = msg.senderId === currentUser.uid;
-  const f = mine ? myProfile : (friends[uid] || {});
-  const c = colorFor(msg.senderId);
-
-  const div = document.createElement('div');
-  div.className = 'msg-row' + (mine?' mine':'');
-
-  const content = msg.image
-    ? `<div class="img-bub" onclick="viewImg('${msg.image}')"><img src="${msg.image}" alt="img" loading="lazy"></div>`
-    : `<div class="bubble ${mine?'mine':'theirs'}">${esc(msg.text)}</div>`;
-
-  div.innerHTML = `
-    ${!mine?`<div class="msav" style="background:${c}22;color:${c}">${initFor(f.name||f.displayName||'?')}</div>`:''}
-    ${content}
-    <div class="mtime">${timeStr(msg.timestamp)}</div>`;
-  list.appendChild(div);
-}
-
-function sendMsg(imageData) {
-  const input = document.getElementById('chatInput');
-  const text = imageData ? '' : (input?.value.trim() || '');
-  if (!text && !imageData) return;
-  if (!activeUid) return;
-  if (input) input.value = '';
-
-  const cid = convIdFor(currentUser.uid, activeUid);
-  const msg = {
-    id: genUID(),
-    senderId: currentUser.uid,
-    text,
-    image: imageData || '',
-    timestamp: Date.now()
-  };
-
-  DB.addMessage(cid, [currentUser.uid, activeUid], msg);
-  renderMessages(activeUid);
-  scrollBottom();
-  updateSidebarList();
-  bc?.postMessage({ type: 'message', cid });
-}
-
-// ════════════════════════════════════════════════
-//  SEARCH PEOPLE
-// ════════════════════════════════════════════════
-function showTab(tab) {
-  currentTab = tab;
-  document.getElementById('tabChats').classList.toggle('active', tab==='chats');
-  document.getElementById('tabSearchPeople').classList.toggle('active', tab==='search');
-  document.getElementById('sidebarSearch').placeholder = tab==='chats' ? 'Search chats...' : 'Search by @username…';
-  document.getElementById('sidebarSearch').value = '';
-
-  if (tab === 'chats') { updateSidebarList(); }
-  else { renderSearchTab(''); }
-}
-
-function onSidebarSearch(val) {
-  if (currentTab === 'chats') updateSidebarList();
-  else renderSearchTab(val.trim().toLowerCase());
-}
-
-function renderSearchTab(query) {
-  const wrap = document.getElementById('listWrap');
-  if (!query) {
-    wrap.innerHTML = '<div class="empty-list">Type a username to find people.</div>';
-    return;
-  }
-  const usernames = DB.getUsernames();
-  const users = DB.getUsers();
-  const results = Object.entries(usernames)
-    .filter(([name]) => name.includes(query) && usernames[name] !== currentUser.uid)
-    .map(([name, uid]) => users[uid])
-    .filter(Boolean);
-
-  wrap.innerHTML = '';
-  if (!results.length) {
-    wrap.innerHTML = '<div class="empty-list">No users found for "<strong>'+esc(query)+'</strong>"</div>';
-    return;
-  }
-  results.forEach(u => {
-    const c = colorFor(u.uid);
-    const div = document.createElement('div');
-    div.className = 'search-result-item';
-    div.innerHTML = `
-      <div class="av" style="background:${c}22;color:${c}">${initFor(u.name||u.displayName)}</div>
-      <div class="ci">
-        <div class="cn">${esc(u.name||u.username)}</div>
-        <div class="cp">@${esc(u.username)}</div>
-      </div>
-      <button style="background:var(--yellow);color:#000;border:none;border-radius:8px;padding:5px 12px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer"
-        onclick="startChat('${esc(u.uid)}')">Message</button>`;
-    wrap.appendChild(div);
-  });
-}
-
-function startChat(uid) {
-  // Load friend if not cached
-  if (!friends[uid]) friends[uid] = DB.getUser(uid);
-  showTab('chats');
-  openChat(uid);
-}
-
-// ════════════════════════════════════════════════
-//  IMAGES
-// ════════════════════════════════════════════════
-function handleImageFile(e) {
-  const file = e.target.files[0];
-  if (!file || !activeUid) return;
-  e.target.value = '';
-  const reader = new FileReader();
-  reader.onload = ev => compress(ev.target.result, 500, url => sendMsg(url));
-  reader.readAsDataURL(file);
-}
-function compress(src, maxW, cb) {
-  const img = new Image();
-  img.onload = () => {
-    const r = Math.min(maxW/img.width, maxW/img.height, 1);
-    const c = document.createElement('canvas');
-    c.width = Math.round(img.width*r); c.height = Math.round(img.height*r);
-    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-    cb(c.toDataURL('image/jpeg', 0.65));
-  };
-  img.src = src;
-}
-function viewImg(src) {
-  document.getElementById('imgViewerImg').src = src;
-  document.getElementById('imgViewer').style.display = 'flex';
-}
-
-// ════════════════════════════════════════════════
-//  UI UTILS
-// ════════════════════════════════════════════════
-function showScreen(name) {
-  document.getElementById('authScreen').style.display     = name==='auth'     ? 'flex'  : 'none';
-  document.getElementById('verifyScreen').style.display   = name==='verify'   ? 'flex'  : 'none';
-  document.getElementById('usernameScreen').style.display = name==='username' ? 'flex'  : 'none';
-  document.getElementById('mainApp').style.display        = name==='main'     ? 'block' : 'none';
-
-  if (name === 'username') {
-    const wrap = document.getElementById('setupAvatarWrap');
-    const label = myProfile?.displayName || myProfile?.name || '??';
-    const key = currentUser?.uid || label;
-    const c = colorFor(key);
-    wrap.innerHTML = `<div class="un-pfp-fallback" style="background:${c}22;color:${c}">${initFor(label)}</div>`;
-  }
-}
-
-function scrollBottom() {
-  setTimeout(() => { const m = document.getElementById('msgs'); if(m) m.scrollTop = m.scrollHeight; }, 40);
-}
-</script>
+  <!-- Main script -->
+  <script src="js/main.js"></script>
 </body>
 </html>
