@@ -3,1061 +3,577 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For Audrey</title>
 
-  <!-- SEO -->
-  <title>LuaForge AI — Build Roblox Games With AI | Lua Scripting Assistant</title>
-  <meta name="description" content="LuaForge AI is the #1 AI-powered Roblox Lua scripting assistant. Generate complete scripts, fix errors instantly, and learn Lua with AI. Start free today." />
-  <meta name="keywords" content="Roblox Lua AI, Roblox scripting assistant, Lua code generator, Roblox script AI, Lua AI tool, Roblox developer tools, AI game scripting, Roblox Studio helper" />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://luaforgeai.com" />
+  <style>
+    :root {
+      --bg1: #111827;
+      --bg2: #312e81;
+      --text: #f8fafc;
+      --muted: rgba(248, 250, 252, 0.72);
+      --accent: #a78bfa;
+      --accent2: #69e8f9;
+      --good: #86efac;
+      --bad: #fca5a5;
+    }
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://luaforgeai.com" />
-  <meta property="og:title" content="LuaForge AI — Build Roblox Games With AI" />
-  <meta property="og:description" content="Generate complete Lua scripts, fix errors, and learn Roblox scripting with your AI coding partner. Ship faster. Build smarter." />
-  <meta property="og:image" content="https://luaforgeai.com/assets/og-image.png" />
-  <meta property="og:site_name" content="LuaForge AI" />
+    * {
+      box-sizing: border-box;
+    }
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="LuaForge AI — Build Roblox Games With AI" />
-  <meta name="twitter:description" content="Generate complete Lua scripts, fix errors, and learn Roblox scripting with your AI coding partner." />
-  <meta name="twitter:image" content="https://luaforgeai.com/assets/og-image.png" />
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(167, 139, 250, 0.28), transparent 30%),
+        radial-gradient(circle at 80% 10%, rgba(103, 232, 249, 0.22), transparent 26%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
 
-  <meta name="theme-color" content="#080A0F" />
+    .sparkle {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
 
-  <!-- Favicon inline SVG -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 36'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%234F8EF7'/><stop offset='100%25' stop-color='%23A855F7'/></linearGradient></defs><path d='M16 1L30 9V27L16 35L2 27V9Z' fill='url(%23g)'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='13' font-weight='700' fill='white'>L</text></svg>" />
+    .sparkle span {
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.7);
+      animation: floatUp linear infinite;
+      opacity: 0.7;
+    }
 
-  <!-- Preconnect -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    @keyframes floatUp {
+      from {
+        transform: translateY(110vh) scale(0.7);
+        opacity: 0;
+      }
 
-  <!-- Fonts: Clash Display + Space Mono + Plus Jakarta Sans -->
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+      12% {
+        opacity: 0.8;
+      }
 
-  <!-- Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+      to {
+        transform: translateY(-20vh) scale(1.4);
+        opacity: 0;
+      }
+    }
 
-  <!-- Prism syntax highlighting — VS Code Dark+ theme -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+    .wrap {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
 
-  <!-- Main stylesheet -->
-  <link rel="stylesheet" href="css/styles.css" />
+    .card {
+      width: min(100%, 540px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: linear-gradient(160deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
+      box-shadow: 0 24px 90px rgba(0, 0, 0, 0.38);
+      border-radius: 32px;
+      padding: clamp(22px, 6vw, 42px);
+      backdrop-filter: blur(18px);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    h1 {
+      font-size: clamp(2rem, 9vw, 4rem);
+      line-height: 0.95;
+      margin: 0 0 16px;
+      letter-spacing: -0.06em;
+    }
+
+    h2 {
+      margin: 18px 0 12px;
+      font-size: clamp(1.5rem, 6vw, 2.2rem);
+      letter-spacing: -0.04em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #ffffff, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    p {
+      margin: 0 auto 18px;
+      max-width: 36rem;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 1.02rem;
+    }
+
+    .icon {
+      font-size: 3.8rem;
+      margin: 10px 0 16px;
+      animation: bounce 1.4s ease-in-out infinite;
+      user-select: none;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .choices {
+      display: grid;
+      gap: 12px;
+      margin: 22px 0;
+    }
+
+    button {
+      border: 0;
+      border-radius: 18px;
+      padding: 15px 18px;
+      font-weight: 800;
+      color: #111827;
+      background: white;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+      font-size: 1rem;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.28);
+      filter: brightness(1.05);
+    }
+
+    button:disabled {
+      opacity: 0.75;
+      cursor: not-allowed;
+    }
+
+    .choice-btn {
+      background: linear-gradient(135deg, #fff, #ddd6fe 48%, #cffafe);
+    }
+
+    .compliment-btn {
+      background: linear-gradient(135deg, #ffffff, #fef3c7, #cffafe);
+    }
+
+    .yes-btn {
+      background: linear-gradient(135deg, #dcfce7, #ffffff, #bbf7d0);
+    }
+
+    .no-btn {
+      background: linear-gradient(135deg, #fee2e2, #ffffff, #fecaca);
+    }
+
+    .selected {
+      outline: 4px solid rgba(255, 255, 255, 0.7);
+      transform: scale(1.03);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message {
+      min-height: 28px;
+      font-weight: 900;
+      margin-top: 10px;
+    }
+
+    .wrong {
+      color: var(--bad);
+      animation: shake 0.28s ease;
+    }
+
+    .right {
+      color: var(--good);
+    }
+
+    @keyframes shake {
+      0%, 100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-6px);
+      }
+
+      75% {
+        transform: translateX(6px);
+      }
+    }
+
+    .section {
+      animation: slideIn 0.45s ease both;
+      margin-top: 18px;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .send,
+    .next {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), #fff, var(--accent2));
+      margin-top: 12px;
+    }
+
+    .date-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 22px 0;
+    }
+
+    .status {
+      min-height: 24px;
+      margin-top: 14px;
+      font-weight: 700;
+    }
+
+    .success {
+      color: var(--good);
+    }
+
+    .error {
+      color: #ffd0df;
+    }
+
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 16px;
+      top: -20px;
+      z-index: 5;
+      pointer-events: none;
+      animation: confettiFall 2.8s ease-in forwards;
+    }
+
+    @keyframes confettiFall {
+      to {
+        transform: translateY(110vh) rotate(760deg);
+        opacity: 0;
+      }
+    }
+
+    .footer-note {
+      position: fixed;
+      left: 14px;
+      right: 14px;
+      bottom: 12px;
+      z-index: 1;
+      text-align: center;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.42);
+    }
+
+    @media (max-width: 420px) {
+      .date-buttons {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="sparkle" id="sparkle"></div>
 
-  <!-- Particle canvas -->
-  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+  <main class="wrap">
+    <section class="card">
+      <div class="badge">✨ Audrey unlocked a side quest ✨</div>
 
-  <!-- Ambient glow orbs -->
-  <div class="ambient-orb orb-1" aria-hidden="true"></div>
-  <div class="ambient-orb orb-2" aria-hidden="true"></div>
-  <div class="ambient-orb orb-3" aria-hidden="true"></div>
+      <h1>Hey <span class="gradient-text">Audrey</span></h1>
+      <div class="icon">🎮</div>
 
-  <!-- ══════════════════════════════════════════
-       NAVBAR
-  ══════════════════════════════════════════ -->
-  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
-    <div class="nav-inner">
-      <a href="#" class="nav-logo" aria-label="LuaForge AI home">
-        <svg class="logo-hex" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M16 1L30 9V27L16 35L2 27V9L16 1Z" stroke="url(#hexGrad)" stroke-width="1.5" fill="url(#hexFill)"/>
-          <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="white">L</text>
-          <defs>
-            <linearGradient id="hexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#4F8EF7"/>
-              <stop offset="100%" stop-color="#A855F7"/>
-            </linearGradient>
-            <linearGradient id="hexFill" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#4F8EF7" stop-opacity="0.18"/>
-              <stop offset="100%" stop-color="#A855F7" stop-opacity="0.18"/>
-            </linearGradient>
-          </defs>
-        </svg>
-        <span class="logo-text">LuaForge <span class="logo-ai">AI</span></span>
-      </a>
-
-      <ul class="nav-links" role="list">
-        <li><a href="#features">Features</a></li>
-        <li><a href="#tools">Tools</a></li>
-        <li><a href="#demo">Demo</a></li>
-        <li><a href="#pricing">Pricing</a></li>
-        <li><a href="#community">Community</a></li>
-      </ul>
-
-      <div class="nav-actions">
-        <a href="#" class="btn-ghost">Log in</a>
-        <a href="#pricing" class="btn-primary nav-cta">
-          <i class="fa-solid fa-bolt" aria-hidden="true"></i> Get Started
-        </a>
-      </div>
-
-      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-
-    <div class="mobile-menu" id="mobileMenu" role="menu">
-      <a href="#features" role="menuitem">Features</a>
-      <a href="#tools" role="menuitem">Tools</a>
-      <a href="#demo" role="menuitem">Demo</a>
-      <a href="#pricing" role="menuitem">Pricing</a>
-      <a href="#community" role="menuitem">Community</a>
-      <div class="mobile-actions">
-        <a href="#" class="btn-ghost w-full">Log in</a>
-        <a href="#pricing" class="btn-primary w-full">
-          <i class="fa-solid fa-bolt" aria-hidden="true"></i> Get Started
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ══════════════════════════════════════════
-       HERO
-  ══════════════════════════════════════════ -->
-  <section class="hero" id="hero" aria-label="Hero section">
-    <div class="hero-bg-grid" aria-hidden="true"></div>
-    <div class="hero-glow glow-1" aria-hidden="true"></div>
-    <div class="hero-glow glow-2" aria-hidden="true"></div>
-
-    <!-- Floating code snippets -->
-    <div class="floating-snippet snippet-1" aria-hidden="true">
-      <span class="lua-kw">local</span> Players <span class="lua-op">=</span><br/>
-      &nbsp;&nbsp;game:<span class="lua-fn">GetService</span>(<span class="lua-str">"Players"</span>)
-    </div>
-    <div class="floating-snippet snippet-2" aria-hidden="true">
-      <span class="lua-cm">-- ✓ AI Generated</span><br/>
-      hrp:<span class="lua-fn">TakeDamage</span>(DAMAGE)
-    </div>
-    <div class="floating-snippet snippet-3" aria-hidden="true">
-      <span class="lua-kw">local</span> DAMAGE <span class="lua-op">=</span> <span class="lua-num">25</span><br/>
-      <span class="lua-kw">local</span> COOLDOWN <span class="lua-op">=</span> <span class="lua-num">1.0</span>
-    </div>
-
-    <div class="hero-content">
-      <div class="hero-badge fade-up">
-        <span class="badge-dot" aria-hidden="true"></span>
-        <span>AI-Powered Roblox Scripting</span>
-        <span class="badge-sep" aria-hidden="true">·</span>
-        <span class="badge-new">Powered by Gemini</span>
-      </div>
-
-      <h1 class="hero-title fade-up delay-1">
-        Build Roblox<br/>
-        <span class="gradient-text glow-text">Games With AI</span>
-      </h1>
-
-      <p class="hero-subtitle fade-up delay-2">
-        Generate complete Lua scripts, debug errors instantly, and learn Roblox scripting
-        with your AI coding partner. Ship faster. Build smarter.
-      </p>
-
-      <div class="hero-input-wrap fade-up delay-3">
-        <div class="hero-input-box" role="search">
-          <span class="input-icon" aria-hidden="true"><i class="fa-solid fa-terminal"></i></span>
-          <label for="heroInput" class="sr-only">Describe the script you want</label>
-          <input
-            type="text"
-            id="heroInput"
-            placeholder='Try: "Make a sword combat system"'
-            autocomplete="off"
-            spellcheck="false"
-            aria-label="Describe the Roblox Lua script you want to generate"
-          />
-          <button class="btn-generate" id="generateBtn" aria-label="Generate script">
-            <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-            <span>Generate</span>
-          </button>
-        </div>
-        <div class="hero-suggestions" role="list" aria-label="Example prompts">
-          <button class="suggestion-chip" data-text="Make a gun shooting system with raycasting" role="listitem">🔫 Gun system</button>
-          <button class="suggestion-chip" data-text="Create a tycoon money dropper that gives cash every 5 seconds" role="listitem">💰 Money dropper</button>
-          <button class="suggestion-chip" data-text="Add an animated leaderboard GUI with player rankings" role="listitem">🏆 Leaderboard GUI</button>
-          <button class="suggestion-chip" data-text="Make a vehicle spawner with a GUI selection menu" role="listitem">🚗 Vehicle spawner</button>
-          <button class="suggestion-chip" data-text="Create a smooth day and night cycle script" role="listitem">🌙 Day/Night cycle</button>
-        </div>
-      </div>
-
-      <div class="hero-btns fade-up delay-4">
-        <a href="#demo" class="btn-primary btn-large">
-          <i class="fa-solid fa-bolt" aria-hidden="true"></i> Try AI Now
-        </a>
-        <a href="#demo" class="btn-outline btn-large">
-          <i class="fa-solid fa-play" aria-hidden="true"></i> Watch Demo
-        </a>
-      </div>
-    </div>
-
-    <!-- Hero code output panel -->
-    <div class="hero-output-panel" id="heroOutput" aria-live="polite" aria-label="Generated code output">
-      <div class="output-header">
-        <div class="output-dots" aria-hidden="true">
-          <span class="dot dot-red"></span>
-          <span class="dot dot-yellow"></span>
-          <span class="dot dot-green"></span>
-        </div>
-        <span class="output-filename">
-          <i class="fa-solid fa-file-code" aria-hidden="true"></i> luaforge_output.lua
-        </span>
-        <button class="copy-btn" id="heroCopyBtn" aria-label="Copy generated code">
-          <i class="fa-regular fa-copy" aria-hidden="true"></i> <span>Copy</span>
-        </button>
-      </div>
-      <div class="output-body" id="heroOutputBody">
-        <div class="ai-typing-indicator" id="typingIndicator" style="display:none;">
-          <div class="typing-label">
-            <i class="fa-solid fa-microchip" aria-hidden="true"></i> LuaForge AI is generating
-          </div>
-          <div class="typing-dots" aria-label="Loading"><span></span><span></span><span></span></div>
-        </div>
-        <pre id="heroCode" class="code-block language-lua" style="display:none;"></pre>
-        <div class="output-placeholder" id="outputPlaceholder">
-          <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-          <span>Your generated script will appear here</span>
-          <span class="output-hint">Describe what you want above and click Generate</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════
-       TRUST BANNER
-  ══════════════════════════════════════════ -->
-  <div class="trust-banner" aria-label="Social proof">
-    <div class="trust-inner">
-      <span class="trust-label">Trusted by Roblox developers worldwide</span>
-      <div class="trust-logos">
-        <span><i class="fa-brands fa-discord" aria-hidden="true"></i> 2K+ Discord Members</span>
-        <span class="sep" aria-hidden="true">·</span>
-        <span><i class="fa-solid fa-code" aria-hidden="true"></i> 10K+ Scripts Generated</span>
-        <span class="sep" aria-hidden="true">·</span>
-        <span><i class="fa-solid fa-star" aria-hidden="true"></i> 4.9/5 Rating</span>
-        <span class="sep" aria-hidden="true">·</span>
-        <span><i class="fa-solid fa-rocket" aria-hidden="true"></i> 99% Faster Workflow</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════
-       STATS
-  ══════════════════════════════════════════ -->
-  <section class="stats-section" id="stats" aria-label="Platform statistics">
-    <div class="container">
-      <div class="stats-grid">
-        <div class="stat-card fade-up">
-          <div class="stat-icon" aria-hidden="true"><i class="fa-solid fa-code"></i></div>
-          <div class="stat-number-wrap">
-            <span class="stat-number" data-target="10000">0</span>
-            <span class="stat-suffix">+</span>
-          </div>
-          <span class="stat-desc">Scripts Generated</span>
-        </div>
-        <div class="stat-card fade-up delay-1">
-          <div class="stat-icon" aria-hidden="true"><i class="fa-solid fa-users"></i></div>
-          <div class="stat-number-wrap">
-            <span class="stat-number" data-target="2000">0</span>
-            <span class="stat-suffix">+</span>
-          </div>
-          <span class="stat-desc">Active Developers</span>
-        </div>
-        <div class="stat-card fade-up delay-2">
-          <div class="stat-icon" aria-hidden="true"><i class="fa-solid fa-bolt"></i></div>
-          <div class="stat-number-wrap">
-            <span class="stat-number" data-target="99">0</span>
-            <span class="stat-suffix">%</span>
-          </div>
-          <span class="stat-desc">Faster Workflow</span>
-        </div>
-        <div class="stat-card fade-up delay-3">
-          <div class="stat-icon" aria-hidden="true"><i class="fa-solid fa-star"></i></div>
-          <div class="stat-number-wrap">
-            <span class="stat-number" data-target="49">0</span>
-            <span class="stat-suffix">/5</span>
-          </div>
-          <span class="stat-desc">Average Rating</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════
-       FEATURES
-  ══════════════════════════════════════════ -->
-  <section class="features-section" id="features" aria-label="Features">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-label fade-up">What We Offer</div>
-        <h2 class="section-title fade-up delay-1">
-          Everything you need to<br/><span class="gradient-text">script smarter</span>
-        </h2>
-        <p class="section-sub fade-up delay-2">
-          Three powerful AI tools built for every Roblox developer — from beginners to full studios.
+      <div id="startSection">
+        <p>
+          This is basically a mini guessing game. There is only one correct answer.
         </p>
-      </div>
 
-      <div class="features-grid">
-        <article class="feature-card fade-up">
-          <div class="feature-card-glow glow-blue" aria-hidden="true"></div>
-          <div class="feature-icon-wrap icon-blue" aria-hidden="true">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
-          </div>
-          <h3>Script Generator</h3>
-          <p>Describe what you need in plain English. LuaForge AI writes complete, functional Roblox Lua scripts — from simple tools to complex game systems — in seconds.</p>
-          <div class="feature-tags" aria-label="Tags">
-            <span>Instant Output</span>
-            <span>Lua 5.1</span>
-            <span>Roblox API</span>
-          </div>
-        </article>
+        <h2 class="gradient-text">What do you think this is about?</h2>
 
-        <article class="feature-card fade-up delay-1">
-          <div class="feature-card-glow glow-purple" aria-hidden="true"></div>
-          <div class="feature-icon-wrap icon-purple" aria-hidden="true">
-            <i class="fa-solid fa-bug-slash"></i>
-          </div>
-          <h3>AI Error Fixer</h3>
-          <p>Paste any broken script. Our AI pinpoints exactly what's wrong, explains the issue in plain terms, and returns a working version — ready to drop into Studio.</p>
-          <div class="feature-tags">
-            <span>Auto Debug</span>
-            <span>Stack Trace</span>
-            <span>Explanations</span>
-          </div>
-        </article>
-
-        <article class="feature-card fade-up delay-2">
-          <div class="feature-card-glow glow-cyan" aria-hidden="true"></div>
-          <div class="feature-icon-wrap icon-cyan" aria-hidden="true">
-            <i class="fa-solid fa-graduation-cap"></i>
-          </div>
-          <h3>Lua Tutor</h3>
-          <p>Learn Roblox scripting with an AI tutor that adapts to your level. It explains concepts, walks through examples, and answers any question at any skill level.</p>
-          <div class="feature-tags">
-            <span>Interactive</span>
-            <span>Beginner-Friendly</span>
-            <span>Step-by-Step</span>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════
-       TOOLS
-  ══════════════════════════════════════════ -->
-  <section class="tools-section" id="tools" aria-label="Developer Tools">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-label fade-up">Developer Tools</div>
-        <h2 class="section-title fade-up delay-1">
-          Powerful tools for<br/><span class="gradient-text">every problem</span>
-        </h2>
-        <p class="section-sub fade-up delay-2">Fix scripts and decode Roblox errors in seconds.</p>
-      </div>
-
-      <div class="tools-tabs fade-up delay-3" role="tablist" aria-label="Tool tabs">
-        <button class="tab-btn active" data-tab="fix" role="tab" aria-selected="true" aria-controls="tab-fix">
-          <i class="fa-solid fa-wrench" aria-hidden="true"></i> Fix My Script
-        </button>
-        <button class="tab-btn" data-tab="explain" role="tab" aria-selected="false" aria-controls="tab-explain">
-          <i class="fa-solid fa-magnifying-glass-minus" aria-hidden="true"></i> Explain This Error
-        </button>
-      </div>
-
-      <!-- Fix My Script -->
-      <div class="tool-panel active" id="tab-fix" role="tabpanel" aria-label="Fix My Script tool">
-        <div class="tool-two-col">
-          <div class="tool-col">
-            <div class="tool-col-header">
-              <span><i class="fa-solid fa-file-code" aria-hidden="true"></i> Paste Broken Script</span>
-              <button class="clear-btn" id="clearFixInput" aria-label="Clear input">
-                <i class="fa-solid fa-xmark"></i> Clear
-              </button>
-            </div>
-            <div class="code-editor-wrap">
-              <label for="fixScriptInput" class="sr-only">Paste your broken Roblox Lua script</label>
-              <textarea
-                id="fixScriptInput"
-                class="code-textarea"
-                spellcheck="false"
-                autocomplete="off"
-                placeholder="-- Paste your broken Roblox Lua script here...
--- Example:
-local Players = game:GetService('Players')
-local player = Players.LocalPLayer  -- typo here"
-              ></textarea>
-            </div>
-            <button class="btn-primary full-width mt-3" id="fixScriptBtn">
-              <i class="fa-solid fa-wrench" aria-hidden="true"></i> Fix My Script
-            </button>
-          </div>
-
-          <div class="tool-col">
-            <div class="tool-col-header">
-              <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Fixed Script</span>
-              <button class="copy-btn" id="fixOutputCopyBtn" style="display:none;" aria-label="Copy fixed script">
-                <i class="fa-regular fa-copy" aria-hidden="true"></i> <span>Copy</span>
-              </button>
-            </div>
-            <div class="code-output-wrap" id="fixOutput" aria-live="polite">
-              <div class="tool-placeholder">
-                <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-                <span>Your fixed script will appear here</span>
-              </div>
-            </div>
-            <div class="error-explanation" id="fixExplanation" style="display:none;">
-              <div class="explanation-header">
-                <i class="fa-solid fa-lightbulb" aria-hidden="true"></i> What was fixed
-              </div>
-              <div id="fixExplanationText"></div>
-            </div>
-          </div>
+        <div class="choices" id="choices">
+          <button class="choice-btn" onclick="pickChoice('A random question')">A random question</button>
+          <button class="choice-btn" onclick="pickChoice('Homework or something')">Homework or something</button>
+          <button class="choice-btn" onclick="pickChoice('Tell you why I like you')">Tell you why I like you</button>
+          <button class="choice-btn" onclick="pickChoice('A secret mission')">A secret mission</button>
         </div>
+
+        <div class="message" id="choiceMessage"></div>
       </div>
 
-      <!-- Explain This Error -->
-      <div class="tool-panel" id="tab-explain" role="tabpanel" aria-label="Explain This Error tool">
-        <div class="tool-two-col">
-          <div class="tool-col">
-            <div class="tool-col-header">
-              <span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Paste Error Message</span>
-              <button class="clear-btn" id="clearExplainInput" aria-label="Clear input">
-                <i class="fa-solid fa-xmark"></i> Clear
-              </button>
-            </div>
-            <div class="error-examples" role="list" aria-label="Example errors">
-              <button class="err-chip" data-error="attempt to index nil value 'player'">attempt to index nil</button>
-              <button class="err-chip" data-error="Stack overflow in script">Stack overflow</button>
-              <button class="err-chip" data-error="attempt to call a nil value">nil value call</button>
-              <button class="err-chip" data-error="bad argument #1 to 'format' (string expected)">bad argument</button>
-            </div>
-            <label for="explainErrorInput" class="sr-only">Paste your Roblox Studio error message</label>
-            <textarea
-              id="explainErrorInput"
-              class="code-textarea"
-              style="min-height:180px;"
-              spellcheck="false"
-              placeholder="Paste your Roblox Studio error here...
-Example: attempt to index nil value 'player' - ServerScript:12"
-            ></textarea>
-            <button class="btn-primary full-width mt-3" id="explainErrorBtn">
-              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> Explain This Error
-            </button>
-          </div>
+      <section class="section hidden" id="complimentSection">
+        <h2 class="gradient-text">What do I like about you?</h2>
 
-          <div class="tool-col">
-            <div class="tool-col-header">
-              <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> AI Explanation</span>
-            </div>
-            <div class="explanation-output" id="explainOutput" aria-live="polite">
-              <div class="tool-placeholder">
-                <i class="fa-solid fa-magnifying-glass-minus" aria-hidden="true"></i>
-                <span>Error explanation will appear here</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════
-       LIVE AI CHAT DEMO
-  ══════════════════════════════════════════ -->
-  <section class="demo-section" id="demo" aria-label="Live AI Chat Demo">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-label fade-up">Live AI Chat</div>
-        <h2 class="section-title fade-up delay-1">
-          Chat with the AI <span class="gradient-text">in real-time</span>
-        </h2>
-        <p class="section-sub fade-up delay-2">
-          Ask anything about Roblox scripting. Get code, explanations, and fixes instantly.
+        <p>
+          Pick the correct answer.
         </p>
-      </div>
 
-      <div class="chat-window fade-up delay-3" role="application" aria-label="LuaForge AI Chat">
-
-        <!-- Sidebar -->
-        <aside class="chat-sidebar" aria-label="Chat sidebar">
-          <div class="sidebar-header">
-            <span><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> History</span>
-            <button class="clear-chat-btn" id="clearChatBtn" title="Clear chat" aria-label="Clear chat history">
-              <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
-            </button>
-          </div>
-
-          <div class="sidebar-section">
-            <div class="sidebar-label">Saved Prompts</div>
-            <div class="saved-prompts" id="savedPrompts">
-              <div class="saved-prompt" data-prompt="Make a sword combat system with damage and cooldown">
-                <i class="fa-solid fa-bookmark" aria-hidden="true"></i> Sword combat system
-              </div>
-              <div class="saved-prompt" data-prompt="Create a tycoon money dropper that gives players cash every 5 seconds">
-                <i class="fa-solid fa-bookmark" aria-hidden="true"></i> Tycoon money dropper
-              </div>
-              <div class="saved-prompt" data-prompt="Build a vehicle spawner with a GUI menu">
-                <i class="fa-solid fa-bookmark" aria-hidden="true"></i> Vehicle spawner GUI
-              </div>
-            </div>
-          </div>
-
-          <div class="sidebar-section">
-            <div class="sidebar-label">Recent Chats</div>
-            <div class="chat-history" id="chatHistory">
-              <div class="history-empty">
-                <i class="fa-solid fa-comment-slash" aria-hidden="true"></i>
-                <span>No recent chats</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="sidebar-footer">
-            <div class="usage-bar-wrap">
-              <div class="usage-label">
-                <span>Daily usage</span>
-                <span class="usage-count" id="usageCount">3 / 5 free</span>
-              </div>
-              <div class="usage-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" aria-label="Daily usage 3 of 5">
-                <div class="usage-fill" id="usageFill" style="width:60%"></div>
-              </div>
-            </div>
-            <a href="#pricing" class="upgrade-btn">
-              <i class="fa-solid fa-crown" aria-hidden="true"></i> Upgrade to Pro
-            </a>
-          </div>
-        </aside>
-
-        <!-- Main chat area -->
-        <main class="chat-main">
-          <div class="chat-header">
-            <div class="chat-header-left">
-              <div class="ai-avatar-sm" aria-hidden="true">
-                <svg viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="28">
-                  <path d="M16 1L30 9V27L16 35L2 27V9L16 1Z" stroke="url(#hg2)" stroke-width="1.5" fill="url(#hf2)"/>
-                  <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="white">L</text>
-                  <defs>
-                    <linearGradient id="hg2" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#4F8EF7"/><stop offset="100%" stop-color="#A855F7"/>
-                    </linearGradient>
-                    <linearGradient id="hf2" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#4F8EF7" stop-opacity="0.2"/><stop offset="100%" stop-color="#A855F7" stop-opacity="0.2"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <div>
-                <div class="chat-ai-name">LuaForge AI</div>
-                <div class="chat-ai-status">
-                  <span class="status-dot" aria-hidden="true"></span>
-                  Online · Powered by Gemini
-                </div>
-              </div>
-            </div>
-            <div class="chat-header-right">
-              <button class="icon-btn" id="newChatBtn" title="New chat" aria-label="Start new chat">
-                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Chat messages">
-            <div class="msg-row ai-row" id="welcomeMsg">
-              <div class="msg-avatar ai-avatar" aria-hidden="true">
-                <i class="fa-solid fa-microchip"></i>
-              </div>
-              <div class="msg-body">
-                <div class="msg-name">LuaForge AI</div>
-                <div class="msg-bubble ai-bubble">
-                  <p>👋 Hey! I'm your AI Roblox scripting assistant.</p>
-                  <p>I can help you <strong>generate scripts</strong>, <strong>fix errors</strong>, and <strong>explain Lua concepts</strong>. What do you want to build today?</p>
-                </div>
-                <div class="quick-prompts" role="list" aria-label="Quick prompts">
-                  <button class="quick-chip" data-prompt="Make a sword combat system with damage, animations, and 1 second cooldown">⚔️ Sword combat</button>
-                  <button class="quick-chip" data-prompt="Create a tycoon money dropper that gives 10 cash every 5 seconds">💰 Money dropper</button>
-                  <button class="quick-chip" data-prompt="Explain how RemoteEvents work in Roblox">📡 RemoteEvents</button>
-                  <button class="quick-chip" data-prompt="Make a door that opens when a player touches it">🚪 Touch door</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="chat-input-area">
-            <div class="chat-input-box">
-              <label for="chatInput" class="sr-only">Message LuaForge AI</label>
-              <textarea
-                id="chatInput"
-                class="chat-textarea"
-                placeholder="Ask LuaForge AI anything about Roblox scripting..."
-                rows="1"
-                aria-label="Type your message"
-              ></textarea>
-              <div class="chat-input-actions">
-                <button class="icon-btn save-prompt-btn" id="savePromptBtn" title="Save this prompt" aria-label="Save prompt">
-                  <i class="fa-regular fa-bookmark" aria-hidden="true"></i>
-                </button>
-                <button class="btn-send" id="sendChatBtn" aria-label="Send message">
-                  <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
-                </button>
-              </div>
-            </div>
-            <div class="chat-footer-note" aria-label="Disclaimer">
-              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-              Always test AI-generated scripts in Roblox Studio before publishing.
-            </div>
-          </div>
-        </main>
-
-        <!-- Code panel (right) -->
-        <aside class="chat-code-panel" id="chatCodePanel" aria-label="Generated code panel">
-          <div class="code-panel-header">
-            <div class="code-dots" aria-hidden="true">
-              <span class="dot dot-red"></span>
-              <span class="dot dot-yellow"></span>
-              <span class="dot dot-green"></span>
-            </div>
-            <span class="code-panel-filename" id="codePanelFilename">
-              <i class="fa-solid fa-file-code" aria-hidden="true"></i> <span>output.lua</span>
-            </span>
-            <button class="copy-btn" id="codePanelCopyBtn" aria-label="Copy code">
-              <i class="fa-regular fa-copy" aria-hidden="true"></i> <span>Copy</span>
-            </button>
-          </div>
-          <div class="code-panel-body">
-            <div class="code-panel-placeholder" id="codePanelPlaceholder">
-              <i class="fa-solid fa-code" aria-hidden="true"></i>
-              <span>Generated code will<br/>appear here</span>
-            </div>
-            <pre class="language-lua" id="codePanelPre" style="display:none;"><code id="codePanelCode"></code></pre>
-          </div>
-          <div class="code-panel-footer" id="codePanelFooter" style="display:none;">
-            <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Ready — paste into Studio</span>
-            <span id="genTime"></span>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════
-       TESTIMONIALS
-  ══════════════════════════════════════════ -->
-  <section class="testimonials-section" id="testimonials" aria-label="Testimonials">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-label fade-up">Developer Reviews</div>
-        <h2 class="section-title fade-up delay-1">
-          Loved by Roblox<br/><span class="gradient-text">developers</span>
-        </h2>
-      </div>
-
-      <div class="testimonials-grid">
-        <article class="testimonial-card fade-up">
-          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <p>"LuaForge AI saved me hours. I used to spend entire evenings debugging — now I paste the error and get the fix in seconds. Absolutely worth it."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar" style="background:linear-gradient(135deg,#4F8EF7,#A855F7)" aria-hidden="true">R</div>
-            <div>
-              <div class="author-name">RblxDev_Ryan</div>
-              <div class="author-role">Game Developer · 3 years on Roblox</div>
-            </div>
-          </div>
-        </article>
-
-        <article class="testimonial-card fade-up delay-1">
-          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <p>"I'm 14 and just started learning scripting. The Lua Tutor explains things better than any YouTube video I've watched. This tool is incredible."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar" style="background:linear-gradient(135deg,#22D3EE,#4F8EF7)" aria-hidden="true">S</div>
-            <div>
-              <div class="author-name">StarterScript_S</div>
-              <div class="author-role">Beginner Developer · Learning Lua</div>
-            </div>
-          </div>
-        </article>
-
-        <article class="testimonial-card fade-up delay-2">
-          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <p>"Generated a full tycoon system in under 5 minutes. It even added comments and error handling I didn't ask for. The Pro plan pays for itself."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar" style="background:linear-gradient(135deg,#A855F7,#EC4899)" aria-hidden="true">M</div>
-            <div>
-              <div class="author-name">MetaBuilds_M</div>
-              <div class="author-role">Studio Developer · 12 published games</div>
-            </div>
-          </div>
-        </article>
-
-        <article class="testimonial-card fade-up delay-3">
-          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <p>"The code quality is surprisingly clean. It follows Roblox best practices and uses proper services. Even my senior dev was impressed with the output."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444)" aria-hidden="true">K</div>
-            <div>
-              <div class="author-name">KodeKing_K</div>
-              <div class="author-role">Lead Scripter · Team of 4</div>
-            </div>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════
-       ROADMAP
-  ══════════════════════════════════════════ -->
-  <section class="roadmap-section" id="roadmap" aria-label="Product roadmap">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-label fade-up">Coming Soon</div>
-        <h2 class="section-title fade-up delay-1">
-          What's on the<br/><span class="gradient-text">roadmap</span>
-        </h2>
-      </div>
-      <div class="roadmap-grid">
-        <div class="roadmap-card fade-up">
-          <div class="roadmap-icon"><i class="fa-solid fa-book"></i></div>
-          <h4>Script Library</h4>
-          <p>Browse and reuse hundreds of community-contributed Lua scripts.</p>
-          <span class="roadmap-status coming">Q3 2025</span>
+        <div class="choices">
+          <button class="compliment-btn" onclick="chooseCompliment('I like your hair', this)">I like your hair</button>
+          <button class="compliment-btn" onclick="chooseCompliment('I like your personality', this)">I like your personality</button>
+          <button class="compliment-btn" onclick="chooseCompliment('I like your smile', this)">I like your smile</button>
+          <button class="compliment-btn" onclick="chooseCompliment('All of the above', this)">All of the above</button>
         </div>
-        <div class="roadmap-card fade-up delay-1">
-          <div class="roadmap-icon"><i class="fa-solid fa-gamepad"></i></div>
-          <h4>Game Templates</h4>
-          <p>Full starter kits for popular game genres: RPG, Tycoon, FPS, and more.</p>
-          <span class="roadmap-status coming">Q3 2025</span>
-        </div>
-        <div class="roadmap-card fade-up delay-2">
-          <div class="roadmap-icon"><i class="fa-solid fa-people-group"></i></div>
-          <h4>Team Projects</h4>
-          <p>Collaborate on scripts with your dev team. Shared history and permissions.</p>
-          <span class="roadmap-status planned">Q4 2025</span>
-        </div>
-        <div class="roadmap-card fade-up delay-3">
-          <div class="roadmap-icon"><i class="fa-solid fa-plug"></i></div>
-          <h4>Roblox Studio Plugin</h4>
-          <p>Generate and insert AI scripts directly inside Roblox Studio.</p>
-          <span class="roadmap-status planned">2026</span>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ══════════════════════════════════════════
-       PRICING
-  ══════════════════════════════════════════ -->
-  <section class="pricing-section" id="pricing" aria-label="Pricing">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-label fade-up">Pricing</div>
-        <h2 class="section-title fade-up delay-1">
-          Simple, <span class="gradient-text">transparent</span> pricing
-        </h2>
-        <p class="section-sub fade-up delay-2">
-          Start free. Upgrade when you're ready to build without limits.
+        <div class="message" id="complimentMessage"></div>
+
+        <button class="next hidden" id="nextButton" onclick="showAskSection()">Next →</button>
+      </section>
+
+      <section class="section hidden" id="askSection">
+        <h2 class="gradient-text">So...</h2>
+
+        <p>
+          Do you want to go out with me?
         </p>
-      </div>
 
-      <div class="pricing-toggle-wrap fade-up delay-3" role="group" aria-label="Billing cycle">
-        <button class="pricing-toggle active" data-billing="monthly" aria-pressed="true">Monthly</button>
-        <button class="pricing-toggle" data-billing="yearly" aria-pressed="false">
-          Yearly <span class="save-badge">Save 20%</span>
-        </button>
-      </div>
-
-      <div class="pricing-grid fade-up delay-4">
-        <!-- Free -->
-        <div class="pricing-card">
-          <div class="pricing-card-top">
-            <div class="plan-name">Free</div>
-            <div class="plan-price">
-              <span class="price-amt">$0</span>
-              <span class="price-per">/month</span>
-            </div>
-            <p class="plan-desc">Perfect for exploring AI scripting and getting started with Roblox development.</p>
-          </div>
-          <ul class="plan-features">
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> 5 script generations per day</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Basic Roblox Lua scripts</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Error fixer (3/day)</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Community Discord access</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Standard AI response speed</li>
-            <li class="feat-no"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Advanced game systems</li>
-            <li class="feat-no"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Saved chat history</li>
-            <li class="feat-no"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Priority AI speed</li>
-            <li class="feat-no"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Advanced debugging</li>
-          </ul>
-          <a href="#demo" class="btn-outline full-width" id="freeBtn" data-stripe="free">Start Free</a>
+        <div class="date-buttons">
+          <button class="yes-btn" id="yesButton" onclick="chooseDateAnswer('Yes')">Yes</button>
+          <button class="no-btn" id="noButton" onclick="chooseDateAnswer('No')">No</button>
         </div>
 
-        <!-- Pro -->
-        <div class="pricing-card featured">
-          <div class="popular-badge">
-            <i class="fa-solid fa-crown" aria-hidden="true"></i> Most Popular
-          </div>
-          <div class="pricing-card-top">
-            <div class="plan-name">Pro</div>
-            <div class="plan-price">
-              <span class="price-amt" data-monthly="$10" data-yearly="$8">$10</span>
-              <span class="price-per">/month</span>
-            </div>
-            <p class="plan-desc">For serious Roblox developers who build fast and ship faster — no limits.</p>
-          </div>
-          <ul class="plan-features">
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> <strong>Unlimited</strong> script generations</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Advanced Roblox game systems</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> <strong>Unlimited</strong> error fixing</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> <strong>Priority</strong> AI response speed</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Saved chat history</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Advanced debugging tools</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Priority new features</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Premium Discord access</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Lua Tutor — full access</li>
-          </ul>
-          <a href="#" class="btn-primary full-width" id="proBtn" data-stripe="pro">
-            <i class="fa-solid fa-bolt" aria-hidden="true"></i> Get Pro
-          </a>
-        </div>
+        <div class="message" id="dateMessage"></div>
 
-        <!-- Yearly -->
-        <div class="pricing-card yearly-card">
-          <div class="save-ribbon">Save 20%</div>
-          <div class="pricing-card-top">
-            <div class="plan-name">Yearly</div>
-            <div class="plan-price">
-              <span class="price-amt">$100</span>
-              <span class="price-per">/year</span>
-            </div>
-            <p class="plan-desc">All Pro features. Billed annually at $100/year instead of $120.</p>
-          </div>
-          <ul class="plan-features">
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Everything in Pro</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> <strong>$20 saved</strong> vs monthly</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Early access to new features</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Exclusive yearly member badge</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Priority support queue</li>
-            <li class="feat-yes"><i class="fa-solid fa-check" aria-hidden="true"></i> Unlimited history storage</li>
-          </ul>
-          <a href="#" class="btn-outline full-width yearly-btn" id="yearlyBtn" data-stripe="yearly">
-            <i class="fa-solid fa-calendar" aria-hidden="true"></i> Get Yearly Plan
-          </a>
-          <div class="yearly-note">≈ $8.33/month · Best value</div>
-        </div>
-      </div>
+        <button class="send hidden" id="sendButton" onclick="sendToDiscord()">Send answer</button>
 
-      <div class="pricing-guarantee fade-up">
-        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-        <span>7-day money back guarantee · Cancel anytime · No hidden fees</span>
-      </div>
-    </div>
-  </section>
+        <div class="status" id="status"></div>
+      </section>
+    </section>
+  </main>
 
-  <!-- ══════════════════════════════════════════
-       COMMUNITY / DISCORD
-  ══════════════════════════════════════════ -->
-  <section class="community-section" id="community" aria-label="Community">
-    <div class="container">
-      <div class="discord-card fade-up">
-        <div class="discord-glow" aria-hidden="true"></div>
-        <div class="discord-content">
-          <div class="discord-icon" aria-hidden="true">
-            <i class="fa-brands fa-discord"></i>
-          </div>
-          <div class="discord-text">
-            <h2>Join the LuaForge AI Discord</h2>
-            <p>Connect with 2,000+ Roblox developers. Share scripts, get feedback, and get help from the community.</p>
-            <ul class="discord-perks">
-              <li><i class="fa-solid fa-check"></i> Free help & script reviews</li>
-              <li><i class="fa-solid fa-check"></i> Exclusive tutorials & resources</li>
-              <li><i class="fa-solid fa-check"></i> Early access to new features</li>
-            </ul>
-          </div>
-          <a href="#" class="btn-discord" aria-label="Join our Discord server">
-            <i class="fa-brands fa-discord" aria-hidden="true"></i> Join Discord — It's Free
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
+  <div class="footer-note">Made with HTML, mystery, and questionable confidence.</div>
 
-  <!-- ══════════════════════════════════════════
-       WAITLIST / EMAIL CAPTURE
-  ══════════════════════════════════════════ -->
-  <section class="waitlist-section" id="waitlist" aria-label="Early access signup">
-    <div class="container">
-      <div class="waitlist-card fade-up">
-        <div class="waitlist-badge">🚀 Early Access</div>
-        <h2>Get early access to new features</h2>
-        <p>Be the first to try the Script Library, Studio Plugin, and Team Projects. Join the waitlist.</p>
-        <form class="waitlist-form" id="waitlistForm" aria-label="Early access signup form">
-          <label for="waitlistEmail" class="sr-only">Email address</label>
-          <input
-            type="email"
-            id="waitlistEmail"
-            placeholder="your@email.com"
-            autocomplete="email"
-            aria-label="Your email address"
-            required
-          />
-          <button type="submit" class="btn-primary" id="waitlistBtn">
-            <i class="fa-solid fa-envelope" aria-hidden="true"></i> Get Early Access
-          </button>
-        </form>
-        <p class="waitlist-note" id="waitlistConfirm" style="display:none;">
-          <i class="fa-solid fa-circle-check"></i> You're on the list! We'll be in touch.
-        </p>
-        <p class="waitlist-disclaimer">No spam. Unsubscribe anytime.</p>
-      </div>
-    </div>
-  </section>
+  <script>
+    const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1510865957973786754/gbrDVh8X-cYY_BiuwgxALOpLLgZiq44pES7-CbLJlAfwekM50q70CMICjwBoJHqH0zJo";
 
-  <!-- ══════════════════════════════════════════
-       CTA BANNER
-  ══════════════════════════════════════════ -->
-  <section class="cta-section" aria-label="Call to action">
-    <div class="container">
-      <div class="cta-card fade-up">
-        <div class="cta-glow" aria-hidden="true"></div>
-        <div class="cta-content">
-          <h2>Ready to build faster?</h2>
-          <p>Join 2,000+ Roblox developers already using LuaForge AI to script smarter.</p>
-          <div class="cta-btns">
-            <a href="#demo" class="btn-primary btn-large">
-              <i class="fa-solid fa-bolt" aria-hidden="true"></i> Try AI Now — It's Free
-            </a>
-            <a href="#" class="btn-ghost-white">
-              <i class="fa-brands fa-discord" aria-hidden="true"></i> Join Discord
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    let selectedChoice = "";
+    let complimentAnswer = "";
+    let dateAnswer = "";
 
-  <!-- ══════════════════════════════════════════
-       FOOTER
-  ══════════════════════════════════════════ -->
-  <footer class="footer" aria-label="Site footer">
-    <div class="container">
-      <div class="footer-top">
-        <div class="footer-brand">
-          <a href="#" class="nav-logo" aria-label="LuaForge AI home">
-            <svg class="logo-hex" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M16 1L30 9V27L16 35L2 27V9L16 1Z" stroke="url(#fhg)" stroke-width="1.5" fill="url(#fhf)"/>
-              <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="white">L</text>
-              <defs>
-                <linearGradient id="fhg" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#4F8EF7"/><stop offset="100%" stop-color="#A855F7"/>
-                </linearGradient>
-                <linearGradient id="fhf" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#4F8EF7" stop-opacity="0.15"/><stop offset="100%" stop-color="#A855F7" stop-opacity="0.15"/>
-                </linearGradient>
-              </defs>
-            </svg>
-            <span class="logo-text">LuaForge <span class="logo-ai">AI</span></span>
-          </a>
-          <p>AI-powered Roblox scripting assistant.<br/>Build faster. Ship smarter.</p>
-          <p class="roblox-disclaimer">
-            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-            Not affiliated with Roblox Corporation.
-          </p>
-          <nav class="social-links" aria-label="Social media links">
-            <a href="#" aria-label="Twitter/X"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
-            <a href="#" aria-label="Discord"><i class="fa-brands fa-discord" aria-hidden="true"></i></a>
-            <a href="#" aria-label="GitHub"><i class="fa-brands fa-github" aria-hidden="true"></i></a>
-            <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a>
-          </nav>
-        </div>
+    const correctChoice = "Tell you why I like you";
 
-        <nav class="footer-links" aria-label="Footer navigation">
-          <div class="footer-col">
-            <h4>Product</h4>
-            <a href="#features">Features</a>
-            <a href="#tools">Tools</a>
-            <a href="#demo">AI Demo</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#roadmap">Roadmap</a>
-          </div>
-          <div class="footer-col">
-            <h4>Resources</h4>
-            <a href="#">Documentation</a>
-            <a href="#">Lua Guide</a>
-            <a href="#">Blog</a>
-            <a href="#">Status</a>
-            <a href="#">Changelog</a>
-          </div>
-          <div class="footer-col">
-            <h4>Legal</h4>
-            <a href="privacy.html">Privacy Policy</a>
-            <a href="terms.html">Terms of Service</a>
-            <a href="#">Cookie Policy</a>
-            <a href="#">About</a>
-            <a href="#">Contact</a>
-          </div>
-        </nav>
-      </div>
+    function makeSparkles() {
+      const sparkle = document.getElementById("sparkle");
+      const count = 30;
 
-      <div class="footer-bottom">
-        <span>© 2025 LuaForge AI. All rights reserved.</span>
-        <span class="footer-disclaimer">
-          AI-generated scripts should always be tested before use. LuaForge AI is not affiliated with Roblox Corporation.
-        </span>
-      </div>
-    </div>
-  </footer>
+      for (let i = 0; i < count; i++) {
+        const dot = document.createElement("span");
+        const size = 4 + Math.random() * 8;
 
-  <!-- ══════════════════════════════════════════
-       FEEDBACK BUTTON
-  ══════════════════════════════════════════ -->
-  <div class="feedback-btn-wrap" id="feedbackWrap">
-    <button class="feedback-btn" id="feedbackBtn" aria-label="Report a bug or suggest a feature">
-      <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
-      <span>Feedback</span>
-    </button>
-    <div class="feedback-modal" id="feedbackModal" role="dialog" aria-label="Send feedback" aria-modal="true" style="display:none;">
-      <div class="feedback-modal-header">
-        <span>Send Feedback</span>
-        <button class="feedback-close" id="feedbackClose" aria-label="Close feedback">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <div class="feedback-options">
-        <button class="feedback-option" data-type="bug">
-          <i class="fa-solid fa-bug"></i> Report a Bug
-        </button>
-        <button class="feedback-option" data-type="feature">
-          <i class="fa-solid fa-lightbulb"></i> Suggest a Feature
-        </button>
-      </div>
-      <textarea id="feedbackText" class="feedback-textarea" placeholder="Describe your bug or feature idea..." aria-label="Your feedback"></textarea>
-      <button class="btn-primary full-width" id="feedbackSubmit">
-        <i class="fa-solid fa-paper-plane"></i> Send Feedback
-      </button>
-      <p class="feedback-confirm" id="feedbackConfirm" style="display:none;">
-        <i class="fa-solid fa-circle-check"></i> Thanks! We'll review your feedback.
-      </p>
-    </div>
-  </div>
+        dot.style.left = Math.random() * 100 + "%";
+        dot.style.animationDuration = 5 + Math.random() * 8 + "s";
+        dot.style.animationDelay = Math.random() * 5 + "s";
+        dot.style.width = size + "px";
+        dot.style.height = size + "px";
 
-  <!-- ══════════════════════════════════════════
-       AI BUSY TOAST
-  ══════════════════════════════════════════ -->
-  <div class="toast-wrap" id="toastWrap" aria-live="assertive" aria-atomic="true">
-    <div class="toast" id="toast">
-      <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-      <span id="toastMsg">AI is busy. Try again in a few seconds.</span>
-    </div>
-  </div>
+        sparkle.appendChild(dot);
+      }
+    }
 
-  <!-- Screen-reader utility -->
-  <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}</style>
+    function pickChoice(choice) {
+      selectedChoice = choice;
 
-  <!-- Prism.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+      const message = document.getElementById("choiceMessage");
 
-  <!-- Main script -->
-  <script src="js/main.js"></script>
+      if (choice !== correctChoice) {
+        message.textContent = "Wrong answer. Try again.";
+        message.className = "message wrong";
+        return;
+      }
+
+      message.textContent = "Correct. You found the real reason.";
+      message.className = "message right";
+
+      setTimeout(() => {
+        document.getElementById("startSection").classList.add("hidden");
+        document.getElementById("complimentSection").classList.remove("hidden");
+        confetti();
+      }, 500);
+    }
+
+    function chooseCompliment(answer, button) {
+      complimentAnswer = answer;
+
+      const allButtons = document.querySelectorAll(".compliment-btn");
+      const message = document.getElementById("complimentMessage");
+      const nextButton = document.getElementById("nextButton");
+
+      allButtons.forEach(btn => btn.classList.remove("selected"));
+      button.classList.add("selected");
+
+      if (answer === "All of the above") {
+        message.textContent = "Correct. Obviously.";
+        message.className = "message right";
+        confetti();
+      } else {
+        message.textContent = "True... but not the best answer.";
+        message.className = "message";
+      }
+
+      nextButton.classList.remove("hidden");
+    }
+
+    function showAskSection() {
+      document.getElementById("complimentSection").classList.add("hidden");
+      document.getElementById("askSection").classList.remove("hidden");
+      confetti();
+    }
+
+    function chooseDateAnswer(answer) {
+      dateAnswer = answer;
+
+      const yesButton = document.getElementById("yesButton");
+      const noButton = document.getElementById("noButton");
+      const sendButton = document.getElementById("sendButton");
+      const dateMessage = document.getElementById("dateMessage");
+
+      yesButton.classList.remove("selected");
+      noButton.classList.remove("selected");
+
+      if (answer === "Yes") {
+        yesButton.classList.add("selected");
+        dateMessage.textContent = "You picked yes.";
+        dateMessage.className = "message right";
+        confetti();
+      } else {
+        noButton.classList.add("selected");
+        dateMessage.textContent = "You picked no.";
+        dateMessage.className = "message";
+      }
+
+      sendButton.classList.remove("hidden");
+    }
+
+    function confetti() {
+      const colors = ["#a78bfa", "#67e8f9", "#ffffff", "#fef3c7", "#86efac"];
+
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement("div");
+
+        piece.className = "confetti-piece";
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 0.7 + "s";
+        piece.style.transform = "rotate(" + Math.random() * 360 + "deg)";
+
+        document.body.appendChild(piece);
+
+        setTimeout(() => piece.remove(), 3600);
+      }
+    }
+
+    async function sendToDiscord() {
+      const status = document.getElementById("status");
+      const sendButton = document.getElementById("sendButton");
+
+      if (!dateAnswer) {
+        status.textContent = "Pick yes or no first.";
+        status.className = "status error";
+        return;
+      }
+
+      sendButton.disabled = true;
+      sendButton.textContent = "Sending...";
+      status.textContent = "Sending...";
+      status.className = "status";
+
+      const payload = {
+        username: "Audrey Answer Bot",
+        embeds: [
+          {
+            title: "Audrey answered",
+            color: dateAnswer === "Yes" ? 8847020 : 16557477,
+            fields: [
+              {
+                name: "First correct option",
+                value: selectedChoice || "No choice picked",
+                inline: false
+              },
+              {
+                name: "Compliment answer",
+                value: complimentAnswer || "No compliment answer picked",
+                inline: false
+              },
+              {
+                name: "Wants to go out?",
+                value: dateAnswer,
+                inline: false
+              }
+            ],
+            footer: {
+              text: "Sent from the Audrey page"
+            },
+            timestamp: new Date().toISOString()
+          }
+        ]
+      };
+
+      try {
+        const response = await fetch(DISCORD_WEBHOOK_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error("Discord returned " + response.status);
+        }
+
+        status.textContent = "Sent.";
+        status.className = "status success";
+        sendButton.textContent = "Answer sent";
+        confetti();
+      } catch (error) {
+        console.error(error);
+        status.textContent = "It did not send. Check the webhook URL.";
+        status.className = "status error";
+        sendButton.disabled = false;
+        sendButton.textContent = "Try again";
+      }
+    }
+
+    makeSparkles();
+  </script>
 </body>
 </html>
